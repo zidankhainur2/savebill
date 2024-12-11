@@ -9,9 +9,10 @@ import { toast } from "@/hooks/use-toast";
 
 export default function UploadPage() {
   const [file, setFile] = useState(null);
+  const [question, setQuestion] = useState(""); // State untuk pertanyaan
   const [loading, setLoading] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState(null); 
-  const [uploadHistory, setUploadHistory] = useState([]); 
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [uploadHistory, setUploadHistory] = useState([]);
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -49,10 +50,10 @@ export default function UploadPage() {
   };
 
   const handleUpload = async () => {
-    if (!file) {
+    if (!file || !question.trim()) {
       toast({
-        title: "Tidak Ada File",
-        description: "Silakan pilih file untuk diunggah.",
+        title: "Data Tidak Lengkap",
+        description: "Silakan unggah file CSV dan masukkan pertanyaan.",
         variant: "destructive",
       });
       return;
@@ -63,6 +64,7 @@ export default function UploadPage() {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("question", question); // Tambahkan pertanyaan
 
       const response = await fetch("http://localhost:8080/upload", {
         method: "POST",
@@ -70,7 +72,7 @@ export default function UploadPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Gagal mengunggah file.");
+        throw new Error("Gagal mengunggah data.");
       }
 
       const data = await response.json();
@@ -81,7 +83,7 @@ export default function UploadPage() {
       // Tambahkan ke riwayat
       setUploadHistory((prev) => [
         ...prev,
-        { name: file.name, result: data.answer },
+        { name: file.name, question, result: data.answer },
       ]);
 
       toast({
@@ -90,8 +92,9 @@ export default function UploadPage() {
         variant: "success",
       });
 
-      // Reset input file
+      // Reset input file dan pertanyaan
       setFile(null);
+      setQuestion("");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -150,6 +153,14 @@ export default function UploadPage() {
               )}
             </div>
 
+            <textarea
+              placeholder="Masukkan pertanyaan terkait data Anda..."
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              className="w-full border p-3 rounded-lg mb-4 resize-none"
+              rows="4"
+            ></textarea>
+
             <Button
               onClick={handleUpload}
               disabled={!file || loading}
@@ -163,7 +174,7 @@ export default function UploadPage() {
               ) : (
                 <div className="flex items-center space-x-2">
                   <Upload className="w-5 h-5" />
-                  <span>Unggah File</span>
+                  <span>Unggah Data</span>
                 </div>
               )}
             </Button>
@@ -182,7 +193,7 @@ export default function UploadPage() {
                   {uploadHistory.map((history, index) => (
                     <li key={index} className="text-gray-700">
                       <span className="font-medium">{history.name}</span>:{" "}
-                      {history.result}
+                      <strong>{history.question}</strong> → {history.result}
                     </li>
                   ))}
                 </ul>

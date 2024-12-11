@@ -1,32 +1,22 @@
-Date,Time,Appliance,Energy_Consumption,Room,Status
-2022-01-01,00:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,01:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,02:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,03:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,04:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,05:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,06:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,07:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,08:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,09:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,10:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,11:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,12:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,13:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,14:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,15:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,16:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,17:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,18:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,19:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,20:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,21:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,22:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,23:00,Refrigerator,1.2,Kitchen,On
-2022-01-01,08:00,TV,0.8,Living Room,Off
-2022-01-01,09:00,TV,0.8,Living Room,On
-2022-01-01,10:00,TV,0.8,Living Room,On
-2022-01-01,11:00,TV,0.8,Living Room,On
-2022-01-01,12:00,TV,0.8,Living Room,Off
-2022-01-01,11:00,EVCar,99.9,Garage,On
-2022-01-01,12:00,EVCar,99.9,Garage,Off
+Date,Appliance,Energy_Consumption,Room,Status
+2023-01,Refrigerator,30,Kitchen,On
+2023-01,Air Conditioner,50,Living Room,Off
+2023-01,Washer,15,Laundry,Off
+2023-02,Refrigerator,28,Kitchen,On
+2023-02,Air Conditioner,55,Living Room,On
+2023-02,Washer,20,Laundry,Off
+2023-03,Refrigerator,30,Kitchen,On
+2023-03,Air Conditioner,60,Living Room,On
+2023-03,Washer,25,Laundry,Off
+2023-04,Refrigerator,32,Kitchen,On
+2023-04,Air Conditioner,70,Living Room,On
+2023-04,Washer,30,Laundry,Off
+2023-05,Refrigerator,33,Kitchen,On
+2023-05,Air Conditioner,80,Living Room,On
+2023-05,Washer,40,Laundry,Off
+2023-06,Refrigerator,35,Kitchen,On
+2023-06,Air Conditioner,90,Living Room,On
+2023-06,Washer,50,Laundry,Off
+2023-07,Refrigerator,36,Kitchen,On
+2023-07,Air Conditioner,100,Living Room,On
+2023-07,Washer,55,Laundry,Off
