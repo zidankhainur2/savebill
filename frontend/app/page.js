@@ -1,69 +1,106 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Zap, BarChart, PiggyBank } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "./components/Navbar";
+import EnergyTipsPage from "./components/Tips";
+import EnergyVisualizationPage from "./components/VisualData";
 
 export default function HomePage() {
   return (
-    <div className="bg-gradient-to-br from-green-50 to-green-300 min-h-screen">
+    <div className="bg-gradient-to-br from-green-100 to-green-300 min-h-screen overflow-x-hidden">
       <Navbar />
-      <main className="container mx-auto px-4 pt-16 flex flex-col lg:flex-row items-center justify-between space-y-12 lg:space-y-0 lg:space-x-12">
-        <div className="w-full lg:w-1/2 flex flex-col space-y-8 text-center lg:text-left">
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
-              Analisis Cerdas <br />
-              Tagihan Listrik Anda
-            </h1>
-            <p className="text-lg md:text-xl text-gray-700 max-w-2xl">
-              Unggah data pemakaian listrik bulanan, dapatkan analisis mendalam
-              dan saran hemat energi berbasis AI.
-            </p>
-          </div>
-
-          <Link href="/pages/upload" className="self-center lg:self-start">
-            <Button
-              size="lg"
-              className="group px-8 py-3 text-lg font-semibold space-x-2"
-            >
-              <span>Mulai Sekarang</span>
-              <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </Link>
-
-          <div className="flex flex-wrap justify-center lg:justify-start gap-4 text-gray-700">
-            <div className="flex items-center space-x-2">
-              <Zap className="w-5 h-5 text-green-600" />
-              <span>Analisis Real-time</span>
+      <main className="container mx-auto px-4 min-h-screen flex items-center justify-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
+          {/* Left Content Section */}
+          <div className="flex flex-col space-y-8 text-center lg:text-left">
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight">
+                Analisis Cerdas <br />
+                Tagihan Listrik Anda
+              </h1>
+              <p className="text-lg md:text-xl text-gray-700 max-w-2xl leading-relaxed">
+                Unggah data pemakaian listrik bulanan, dapatkan analisis
+                mendalam dan saran hemat energi berbasis AI.
+              </p>
             </div>
-            <div className="flex items-center space-x-2">
-              <BarChart className="w-5 h-5 text-blue-600" />
-              <span>Visualisasi Data</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <PiggyBank className="w-5 h-5 text-yellow-600" />
-              <Link href="/pages/tips">
-                <span>Tips Hemat Energi</span>
+
+            <div className="flex flex-col items-center lg:items-start space-y-6">
+              <Link href="/pages/upload" className="w-full max-w-xs">
+                <Button
+                  size="lg"
+                  className="w-full group px-8 py-3 text-lg font-semibold space-x-2 bg-green-600 hover:bg-green-700 transition-colors duration-300"
+                >
+                  <span>Mulai Sekarang</span>
+                  <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </Button>
               </Link>
+
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4 text-gray-700 mt-4">
+                <div className="flex items-center space-x-2 hover:text-green-700 transition-colors">
+                  <Zap className="w-5 h-5 text-green-600" />
+                  <span className="text-sm">Analisis Real-time</span>
+                </div>
+                <div className="flex items-center space-x-2 hover:text-blue-700 transition-colors">
+                  <BarChart className="w-5 h-5 text-blue-600" />
+                  <Link href="#visualData">
+                    <span className="text-sm">Visualisasi Data</span>
+                  </Link>
+                </div>
+                <div className="flex items-center space-x-2 hover:text-yellow-700 transition-colors">
+                  <PiggyBank className="w-5 h-5 text-yellow-600" />
+                  <Link href="#tips" className="hover:underline">
+                    <span className="text-sm">Tips Hemat Energi</span>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="relative w-full max-w-[500px]">
-            <Image
-              src="/ucup.png"
-              alt="Ilustrasi Analisis Listrik"
-              width={600}
-              height={600}
-              priority
-              className="w-full h-auto object-contain transform transition-transform duration-300 hover:scale-105"
-            />
-            <div className="absolute -top-10 -left-10 w-24 h-24 bg-green-500/20 rounded-full blur-2xl animate-pulse"></div>
-            <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl animate-pulse"></div>
+          {/* Right Image Section */}
+          <div className="flex items-center justify-center relative">
+            <div className="relative w-full max-w-[500px] group">
+              <Image
+                src="/ucup.png"
+                alt="Ilustrasi Analisis Listrik"
+                width={600}
+                height={600}
+                priority
+                className="w-full h-auto object-contain transform transition-transform duration-500 group-hover:scale-105 group-hover:rotate-2 drop-shadow-xl"
+              />
+              <div className="absolute -top-10 -left-10 w-24 h-24 bg-green-500/20 rounded-full blur-2xl animate-pulse-slow"></div>
+              <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl animate-pulse-slow"></div>
+            </div>
           </div>
         </div>
       </main>
+
+      <div id="visualData">
+        <EnergyVisualizationPage />
+      </div>
+
+      <div id="tips" className="scroll-smooth">
+        <EnergyTipsPage />
+      </div>
+
+      {/* Custom Animation Styles */}
+      <style jsx global>{`
+        @keyframes pulse-slow {
+          0%,
+          100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
+
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }
