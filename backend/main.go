@@ -43,68 +43,63 @@ func main() {
 
 	// File upload endpoint
 	router.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
+		// Baca file dari request
 		file, _, err := r.FormFile("file")
 		if err != nil {
-			http.Error(w, "Failed to read uploaded file", http.StatusBadRequest)
+			http.Error(w, "Invalid file", http.StatusBadRequest)
 			return
 		}
 		defer file.Close()
-	
-		content, err := io.ReadAll(file)
+
+		// Baca isi file
+		fileContent, err := io.ReadAll(file)
 		if err != nil {
-			http.Error(w, "Failed to read file content", http.StatusInternalServerError)
+			http.Error(w, "Error reading file", http.StatusInternalServerError)
 			return
 		}
-	
-		data, err := fileService.ProcessFile(string(content))
+
+		// Proses file
+		data, err := fileService.ProcessFile(string(fileContent))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Analisa data
+		answer, err := aiService.AnalyzeData(data, "query", token)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-	
-		answer, err := aiService.AnalyzeData(data, "Which appliances use the most and least electricity?", token)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	
+
+		// Kirim response
 		response := map[string]string{"status": "success", "answer": answer}
 		json.NewEncoder(w).Encode(response)
 	}).Methods("POST")
-	
+
+	// Chat endpoint
 	router.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
-		var requestBody struct {
-			Query string `json:"query"`
+		// Baca input dari request
+		var input struct {
+			Context string `json:"context"`
+			Query   string `json:"query"`
 		}
-		err := json.NewDecoder(r.Body).Decode(&requestBody)
-		if err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+			http.Error(w, "Invalid input", http.StatusBadRequest)
 			return
 		}
-	
-		session := getSession(r)
-		context := session.Values["context"].(string)
-	
-		chatResp, err := aiService.ChatWithAI(context, requestBody.Query, token)
+
+		// Chat dengan AI
+		result, err := aiService.ChatWithAI(input.Context, input.Query, token)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-	
-		session.Values["context"] = context + "\n" + requestBody.Query + "\n" + chatResp.GeneratedText
-		session.Save(r, w)
-	
-		response := map[string]string{"status": "success", "answer": chatResp.GeneratedText}
+
+		// Kirim response
+		response := map[string]string{"status": "success", "answer": result.GeneratedText}
 		json.NewEncoder(w).Encode(response)
 	}).Methods("POST")
-	
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		response := map[string]string{"message": "Server is running"}
-		json.NewEncoder(w).Encode(response)
-	}).Methods("GET")
-	
-
 
 	// Enable CORS
 	corsHandler := cors.New(cors.Options{
