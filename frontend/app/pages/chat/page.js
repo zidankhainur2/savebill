@@ -1,22 +1,24 @@
 "use client";
 
-import Navbar from "@/app/components/Navbar";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { motion } from "framer-motion"; // Import motion
+import Navbar from "@/app/components/Navbar";
 
 function ChatComponent() {
   const [query, setQuery] = useState("");
   const [responses, setResponses] = useState([]); // Stores both user messages and AI responses
   const [loading, setLoading] = useState(false);
+  const chatContainerRef = useRef(null);
 
   const handleChat = async () => {
     if (!query.trim()) return; // Prevent sending empty messages
 
     setLoading(true);
 
-    // Add user message to chat history
+    // Add user message to chat history with green color
     setResponses((prev) => [...prev, { sender: "user", text: query }]);
 
     try {
@@ -53,47 +55,89 @@ function ChatComponent() {
     }
   };
 
+  // Scroll to bottom when messages are updated
+  useEffect(() => {
+    chatContainerRef.current?.scrollTo({
+      top: chatContainerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [responses]);
+
   return (
-    <div>
+    <div className="flex flex-col h-screen bg-gray-100">
+      {/* Navbar */}
       <Navbar />
-      <Card className="p-4">
-        <div className="space-y-4">
-          {/* Chat Messages */}
-          <div className="space-y-2 max-h-64 overflow-y-auto">
-            {responses.map((response, index) => (
+
+      {/* Chat Card */}
+      <Card className="flex-grow m-4 p-4 shadow-lg rounded-lg bg-white flex flex-col">
+        {/* Chat Messages */}
+        <div
+          ref={chatContainerRef}
+          className="flex-grow overflow-y-auto space-y-4 p-2"
+        >
+          {responses.map((response, index) => (
+            <motion.div
+              key={index}
+              className={`flex ${
+                response.sender === "user" ? "justify-end" : "justify-start"
+              }`}
+              initial={{ opacity: 0, y: 10 }} // Initial state for animation
+              animate={{ opacity: 1, y: 0 }} // Animate to full opacity and no vertical shift
+              transition={{ duration: 0.3 }} // Duration of the animation
+            >
               <div
-                key={index}
-                className={`p-2 rounded ${
+                className={`max-w-md p-3 rounded-lg shadow ${
                   response.sender === "user"
-                    ? "bg-blue-100 text-blue-800"
+                    ? "bg-green-500 text-white" // User color updated to green
                     : response.sender === "ai"
-                    ? "bg-gray-100 text-gray-800"
-                    : "bg-red-100 text-red-800"
+                    ? "bg-gray-200 text-gray-800"
+                    : "bg-red-200 text-red-800"
                 }`}
               >
-                {response.sender === "user"
-                  ? "You: "
-                  : response.sender === "ai"
-                  ? "AI: "
-                  : "System: "}
-                {response.text}
+                {response.sender === "ai" && loading && !response.text ? (
+                  // Skeleton loader while waiting for AI response
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-300 rounded w-32"></div>
+                    <div className="mt-2 h-4 bg-gray-300 rounded w-48"></div>
+                  </div>
+                ) : (
+                  response.text
+                )}
               </div>
-            ))}
-          </div>
+            </motion.div>
+          ))}
+        </div>
 
-          {/* Input Field */}
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type your message..."
-            className="w-full"
-            disabled={loading}
-          />
+        {/* Input and Button */}
+        <div className="flex items-center gap-2 mt-2">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }} // Fade in the input field
+            className="flex-grow"
+          >
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-grow"
+              disabled={loading}
+            />
+          </motion.div>
 
-          {/* Send Button */}
-          <Button onClick={handleChat} disabled={loading || !query.trim()}>
-            {loading ? "Sending..." : "Send"}
-          </Button>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }} // Fade in the button
+          >
+            <Button
+              onClick={handleChat}
+              disabled={loading || !query.trim()}
+              className="bg-green-500 hover:bg-green-600 text-white"
+            >
+              {loading ? "Sending..." : "Send"}
+            </Button>
+          </motion.div>
         </div>
       </Card>
     </div>

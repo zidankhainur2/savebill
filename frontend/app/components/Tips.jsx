@@ -90,7 +90,7 @@ const energyTips = [
 
 export default function EnergyTipsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-bl from-green-50 to-green-100 py-16">
+    <div className="min-h-screen bg-gradient-to-bl from-green-300 to-green-100 py-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 flex items-center justify-center space-x-4">

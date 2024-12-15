@@ -1,231 +1,247 @@
-"use client";
-
 import React, { useState } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-import {
-  Battery,
-  Zap,
-  Globe,
-  TreePine,
-  Factory,
-  CreditCard,
-} from "lucide-react";
+import { Zap, Globe } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Mock Data
-const monthlyEnergyUsage = [
-  { month: "Jan", penggunaan: 450, biaya: 180 },
-  { month: "Feb", penggunaan: 420, biaya: 168 },
-  { month: "Mar", penggunaan: 480, biaya: 192 },
-  { month: "Apr", penggunaan: 500, biaya: 200 },
-  { month: "Mei", penggunaan: 470, biaya: 188 },
-  { month: "Jun", penggunaan: 520, biaya: 208 },
+// Data Persentase Rumah Tangga dengan Listrik PLN
+const electricityAccessData = [
+  { provinsi: "ACEH", persentase: 99.73, region: "Sumatera" },
+  { provinsi: "SUMATERA UTARA", persentase: 99.23, region: "Sumatera" },
+  { provinsi: "SUMATERA BARAT", persentase: 98.95, region: "Sumatera" },
+  { provinsi: "RIAU", persentase: 96.6, region: "Sumatera" },
+  { provinsi: "JAMBI", persentase: 98.9, region: "Sumatera" },
+  { provinsi: "SUMATERA SELATAN", persentase: 97.02, region: "Sumatera" },
+  { provinsi: "BENGKULU", persentase: 99.75, region: "Sumatera" },
+  { provinsi: "LAMPUNG", persentase: 99.21, region: "Sumatera" },
+  { provinsi: "KEP. BANGKA BELITUNG", persentase: 99.66, region: "Sumatera" },
+  { provinsi: "KEP. RIAU", persentase: 98.39, region: "Sumatera" },
+  { provinsi: "DKI JAKARTA", persentase: 99.97, region: "Jawa" },
+  { provinsi: "JAWA BARAT", persentase: 99.9, region: "Jawa" },
+  { provinsi: "JAWA TENGAH", persentase: 99.94, region: "Jawa" },
+  { provinsi: "DI YOGYAKARTA", persentase: 100, region: "Jawa" },
+  { provinsi: "JAWA TIMUR", persentase: 99.71, region: "Jawa" },
+  { provinsi: "BANTEN", persentase: 99.79, region: "Jawa" },
+  { provinsi: "BALI", persentase: 99.9, region: "Bali & Nusa Tenggara" },
+  {
+    provinsi: "NUSA TENGGARA BARAT",
+    persentase: 99.89,
+    region: "Bali & Nusa Tenggara",
+  },
+  {
+    provinsi: "NUSA TENGGARA TIMUR",
+    persentase: 91.01,
+    region: "Bali & Nusa Tenggara",
+  },
+  { provinsi: "KALIMANTAN BARAT", persentase: 92.95, region: "Kalimantan" },
+  { provinsi: "KALIMANTAN TENGAH", persentase: 89.04, region: "Kalimantan" },
+  { provinsi: "KALIMANTAN SELATAN", persentase: 98.89, region: "Kalimantan" },
+  { provinsi: "KALIMANTAN TIMUR", persentase: 96.5, region: "Kalimantan" },
+  { provinsi: "KALIMANTAN UTARA", persentase: 96.18, region: "Kalimantan" },
+  { provinsi: "SULAWESI UTARA", persentase: 99.67, region: "Sulawesi" },
+  { provinsi: "SULAWESI TENGAH", persentase: 96.6, region: "Sulawesi" },
+  { provinsi: "SULAWESI SELATAN", persentase: 98.23, region: "Sulawesi" },
+  { provinsi: "SULAWESI TENGGARA", persentase: 97.83, region: "Sulawesi" },
+  { provinsi: "GORONTALO", persentase: 98.99, region: "Sulawesi" },
+  { provinsi: "SULAWESI BARAT", persentase: 94.99, region: "Sulawesi" },
+  { provinsi: "MALUKU", persentase: 95.37, region: "Maluku & Papua" },
+  { provinsi: "MALUKU UTARA", persentase: 94.27, region: "Maluku & Papua" },
+  { provinsi: "PAPUA BARAT", persentase: 82.31, region: "Maluku & Papua" },
+  { provinsi: "PAPUA BARAT DAYA", persentase: 87.86, region: "Maluku & Papua" },
+  { provinsi: "PAPUA", persentase: 90.24, region: "Maluku & Papua" },
+  { provinsi: "PAPUA SELATAN", persentase: 67.05, region: "Maluku & Papua" },
+  { provinsi: "PAPUA TENGAH", persentase: 35.27, region: "Maluku & Papua" },
+  { provinsi: "PAPUA PEGUNUNGAN", persentase: 14.53, region: "Maluku & Papua" },
 ];
 
-const sumberEnergi = [
-  { name: "Fosil", value: 63 },
-  { name: "Renewable", value: 27 },
-  { name: "Nuklir", value: 10 },
-];
+export default function IndonesiaElectricityAccessMap() {
+  const [viewMode, setViewMode] = useState("region");
 
-const globalEnergyComparison = [
-  { negara: "Indonesia", konsumsi: 1.2 },
-  { negara: "China", konsumsi: 6.3 },
-  { negara: "USA", konsumsi: 4.8 },
-  { negara: "India", konsumsi: 3.5 },
-  { negara: "Eropa", konsumsi: 2.9 },
-];
+  const getColorIntensity = (percentage) => {
+    if (percentage >= 99) return "#00ff00";
+    if (percentage >= 95) return "#7cfc00";
+    if (percentage >= 90) return "#32cd32";
+    if (percentage >= 80) return "#90ee90";
+    if (percentage >= 70) return "#ffd700";
+    if (percentage >= 50) return "#ffa500";
+    return "#ff4500";
+  };
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28"];
-
-export default function EnergyVisualizationPage() {
-  const [activeTab, setActiveTab] = useState("bulanan");
+  const averageAccess =
+    electricityAccessData.reduce((sum, item) => sum + item.persentase, 0) /
+    electricityAccessData.length;
+  const lowestAccess = Math.min(
+    ...electricityAccessData.map((item) => item.persentase)
+  );
+  const highestAccess = Math.max(
+    ...electricityAccessData.map((item) => item.persentase)
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-200 py-12">
+    <div className="bg-gradient-to-br from-green-100 to-green-300 min-h-screen py-12">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 flex items-center justify-center space-x-4">
             <Zap className="w-12 h-12 text-yellow-500 animate-pulse" />
-            <span>Visualisasi Konsumsi Energi</span>
+            <span>Akses Listrik PLN Indonesia 2024</span>
             <Globe className="w-12 h-12 text-green-600 animate-pulse" />
           </h1>
           <p className="text-xl text-gray-700 max-w-4xl mx-auto">
-            Pahami pola konsumsi energi Anda dan konteks global melalui
-            visualisasi mendalam
+            Pemetaan Persentase Rumah Tangga dengan Akses Listrik PLN
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Grafik Penggunaan Bulanan */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 shadow-lg">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle className="flex items-center space-x-2">
-                  <Battery className="w-6 h-6 text-blue-500" />
-                  <span>Penggunaan Energi Bulanan</span>
-                </CardTitle>
+                <CardTitle>Peta Akses Listrik PLN</CardTitle>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setActiveTab("bulanan")}
-                    className={`px-3 py-1 rounded-md ${
-                      activeTab === "bulanan"
-                        ? "bg-blue-500 text-white"
+                    onClick={() => setViewMode("region")}
+                    className={`px-4 py-2 rounded-md ${
+                      viewMode === "region"
+                        ? "bg-blue-600 text-white"
                         : "bg-gray-200"
-                    }`}
+                    } transition-colors duration-300`}
                   >
-                    Konsumsi
+                    Berdasar Wilayah
                   </button>
                   <button
-                    onClick={() => setActiveTab("biaya")}
-                    className={`px-3 py-1 rounded-md ${
-                      activeTab === "biaya"
-                        ? "bg-blue-500 text-white"
+                    onClick={() => setViewMode("persentase")}
+                    className={`px-4 py-2 rounded-md ${
+                      viewMode === "persentase"
+                        ? "bg-blue-600 text-white"
                         : "bg-gray-200"
-                    }`}
+                    } transition-colors duration-300`}
                   >
-                    Biaya
+                    Persentase
                   </button>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={monthlyEnergyUsage}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey={activeTab === "bulanan" ? "penggunaan" : "biaya"}
-                    stroke="#8884d8"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Sumber Energi Global */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Factory className="w-6 h-6 text-green-500" />
-                <span>Sumber Energi Global</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={sumberEnergi}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {sumberEnergi.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="flex justify-center space-x-4 mt-4">
-                {sumberEnergi.map((entry, index) => (
-                  <div key={entry.name} className="flex items-center space-x-2">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                    />
-                    <span>
-                      {entry.name}: {entry.value}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Perbandingan Konsumsi Energi Antar Negara */}
-          <Card className="lg:col-span-3">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Globe className="w-6 h-6 text-blue-500" />
-                <span>Perbandingan Konsumsi Energi Antar Negara</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={globalEnergyComparison}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="negara" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="konsumsi" fill="#8884d8">
-                    {globalEnergyComparison.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          entry.negara === "Indonesia"
-                            ? "#10B981"
-                            : entry.negara === "China"
-                            ? "#3B82F6"
-                            : entry.negara === "USA"
-                            ? "#6366F1"
-                            : "#9333EA"
+              <div className="w-full bg-white rounded-lg p-4">
+                {viewMode === "region" ? (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {electricityAccessData
+                      .reduce((acc, item) => {
+                        if (!acc.find((r) => r.region === item.region)) {
+                          acc.push({
+                            region: item.region,
+                            persentase:
+                              electricityAccessData
+                                .filter((p) => p.region === item.region)
+                                .reduce((sum, p) => sum + p.persentase, 0) /
+                              electricityAccessData.filter(
+                                (p) => p.region === item.region
+                              ).length,
+                          });
                         }
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                        return acc;
+                      }, [])
+                      .map((region) => (
+                        <div
+                          key={region.region}
+                          className="p-4 rounded-lg shadow-md text-center"
+                          style={{
+                            backgroundColor: getColorIntensity(
+                              region.persentase
+                            ),
+                          }}
+                        >
+                          <h3 className="font-semibold text-lg">
+                            {region.region}
+                          </h3>
+                          <p>{region.persentase.toFixed(2)}%</p>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {electricityAccessData
+                      .sort((a, b) => b.persentase - a.persentase)
+                      .map((provinsi) => (
+                        <div
+                          key={provinsi.provinsi}
+                          className="p-4 rounded-lg shadow-md text-center"
+                          style={{
+                            backgroundColor: getColorIntensity(
+                              provinsi.persentase
+                            ),
+                          }}
+                        >
+                          <h3 className="font-semibold text-lg">
+                            {provinsi.provinsi}
+                          </h3>
+                          <p>{provinsi.persentase}%</p>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
-          {/* Statistik Lingkungan */}
-          <Card>
+          <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TreePine className="w-6 h-6 text-green-600" />
-                <span>Dampak Lingkungan</span>
-              </CardTitle>
+              <CardTitle>Statistik Akses Listrik</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-blue-600">3.2</h3>
-                <p className="text-sm text-gray-600">Ton CO2/Kapita</p>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-blue-600">
+                    {averageAccess.toFixed(2)}%
+                  </h3>
+                  <p className="text-sm text-gray-600">Rata-rata Nasional</p>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-green-600">
+                    {highestAccess.toFixed(2)}%
+                  </h3>
+                  <p className="text-sm text-gray-600">Tertinggi</p>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-yellow-600">
+                    {lowestAccess.toFixed(2)}%
+                  </h3>
+                  <p className="text-sm text-gray-600">Terendah</p>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-red-600">
+                    {
+                      electricityAccessData.filter(
+                        (item) => item.persentase < 90
+                      ).length
+                    }
+                  </h3>
+                  <p className="text-sm text-gray-600">Provinsi di Bawah 90%</p>
+                </div>
               </div>
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-green-600">27%</h3>
-                <p className="text-sm text-gray-600">Energi Terbarukan</p>
-              </div>
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-yellow-600">15%</h3>
-                <p className="text-sm text-gray-600">Efisiensi Energi</p>
-              </div>
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-purple-600">5.6</h3>
-                <p className="text-sm text-gray-600">Pohon/Tahun</p>
+            </CardContent>
+          </Card>
+
+          <Card className="lg:col-span-3 shadow-lg">
+            <CardHeader>
+              <CardTitle>Provinsi dengan Akses Listrik Rendah</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {electricityAccessData
+                  .filter((item) => item.persentase < 90)
+                  .sort((a, b) => a.persentase - b.persentase)
+                  .map((provinsi) => (
+                    <div
+                      key={provinsi.provinsi}
+                      className="p-4 bg-white rounded-lg shadow-md border-l-4 border-red-500"
+                    >
+                      <h3 className="font-semibold text-lg">
+                        {provinsi.provinsi}
+                      </h3>
+                      <p className="text-red-600 font-semibold">
+                        {provinsi.persentase}% Akses Listrik
+                      </p>
+                      <p className="text-gray-600">{provinsi.region}</p>
+                    </div>
+                  ))}
               </div>
             </CardContent>
           </Card>

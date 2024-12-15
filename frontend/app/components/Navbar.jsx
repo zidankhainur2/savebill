@@ -29,7 +29,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <Image
-            src="/logo2.png"
+            src="/logo.png"
             alt="Logo"
             width={120}
             height={40}
@@ -57,7 +57,7 @@ export default function Navbar() {
           <Link href="/pages/chat">
             <Button
               variant="default"
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 text-white"
             >
               Hubungi Kami
             </Button>
@@ -106,7 +106,7 @@ export default function Navbar() {
                 >
                   <Button
                     variant="default"
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white"
                   >
                     <Phone className="w-4 h-4 mr-2" />
                     Hubungi Kami
