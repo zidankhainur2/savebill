@@ -15,7 +15,7 @@ export default function HomePage() {
       <main className="container mx-auto px-4 min-h-screen flex items-center justify-center">
         <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
           {/* Left Content Section */}
-          <div className="flex flex-col space-y-8 text-center lg:text-left">
+          <div className="flex flex-col space-y-8 text-center lg:text-left pt-16">
             <div className="space-y-6">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
                 Analisis Cerdas <br />
@@ -39,6 +39,7 @@ export default function HomePage() {
               </Link>
 
               <div className="flex flex-wrap justify-center lg:justify-start gap-4 mt-4">
+                <h1 className="text-gray-400">upcoming features {"--"}</h1>
                 <div className="flex items-center space-x-2 hover:text-yellow-300 transition-colors">
                   <Zap className="w-5 h-5 text-yellow-500" />
                   <span className="text-sm">Analisis Real-time</span>
@@ -84,23 +85,6 @@ export default function HomePage() {
       <div id="tips" className="scroll-smooth">
         <EnergyTipsPage />
       </div> */}
-
-      {/* Custom Animation Styles */}
-      <style jsx global>{`
-        @keyframes pulse-slow {
-          0%,
-          100% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.05);
-          }
-        }
-
-        .animate-pulse-slow {
-          animation: pulse-slow 4s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }

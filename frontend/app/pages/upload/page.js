@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, FileText, Check, Send } from "lucide-react";
+import { Upload, Check, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/app/components/Navbar";
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 export default function UploadPage() {
   const [file, setFile] = useState(null);
@@ -17,6 +18,7 @@ export default function UploadPage() {
   const [uploadHistory, setUploadHistory] = useState([]);
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(""); // State for storing analysis result
   const fileInputRef = useRef(null);
   const chatContainerRef = useRef(null);
 
@@ -71,28 +73,43 @@ export default function UploadPage() {
     formData.append("query", fileQuestion);
 
     try {
-      const response = await fetch("http://localhost:8080/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await axios.post(
+        "http://localhost:8080/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-      if (!response.ok) throw new Error("Gagal mengunggah file.");
-      const data = await response.json();
+      if (response.data.status === "success") {
+        setAnalysisResult(response.data.answer); // Save the analysis result
+        setUploadHistory((prev) => [
+          ...prev,
+          {
+            name: file.name,
+            question: fileQuestion,
+            result: response.data.answer,
+          },
+        ]);
 
-      setUploadHistory((prev) => [
-        ...prev,
-        { name: file.name, question: fileQuestion, result: data.answer },
-      ]);
+        toast({
+          title: "Unggahan Berhasil",
+          description: `Hasil analisis: ${response.data.answer}`,
+          variant: "success",
+        });
 
-      toast({
-        title: "Unggahan Berhasil",
-        description: `Hasil analisis: ${data.answer}`,
-        variant: "success",
-      });
-
-      setFile(null);
-      setFileQuestion("");
-      fileInputRef.current.value = "";
+        setFile(null);
+        setFileQuestion("");
+        fileInputRef.current.value = "";
+      } else {
+        toast({
+          title: "Kesalahan Unggahan",
+          description: "Gagal menganalisa file.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Kesalahan Unggahan",
@@ -110,21 +127,25 @@ export default function UploadPage() {
 
     setLoadingChat(true);
     try {
-      const response = await fetch("http://localhost:8080/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+      const response = await axios.post("http://localhost:8080/chat", {
+        query,
       });
-      if (!response.ok) throw new Error("Gagal mengirim pesan.");
 
-      const data = await response.json();
-      setChatResponses((prev) => [
-        ...prev,
-        { sender: "user", text: query },
-        { sender: "ai", text: data.answer },
-      ]);
-      setQuery("");
-      scrollToBottom();
+      if (response.data.status === "success") {
+        setChatResponses((prev) => [
+          ...prev,
+          { sender: "user", text: query },
+          { sender: "ai", text: response.data.answer },
+        ]);
+        setQuery("");
+        scrollToBottom();
+      } else {
+        toast({
+          title: "Kesalahan Chat",
+          description: "Tidak dapat memberikan jawaban.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Kesalahan Chat",
@@ -191,6 +212,18 @@ export default function UploadPage() {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Analysis Result Card */}
+        {analysisResult && (
+          <Card className="shadow-lg bg-gray-800 border border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-yellow-500">Hasil Analisis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-yellow-500">{analysisResult}</p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Chat Card */}
         <Card className="shadow-lg bg-gray-800 border border-gray-700 flex-grow">
