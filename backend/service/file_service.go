@@ -4,40 +4,43 @@ import (
 	"encoding/csv"
 	"errors"
 	"strings"
+
+	repository "a21hc3NpZ25tZW50/repository/fileRepository"
 )
 
-type FileService struct{}
+type FileService struct {
+	Repo *repository.FileRepository
+}
 
 func (s *FileService) ProcessFile(fileContent string) (map[string][]string, error) {
-	if fileContent == "" {
-		return nil, errors.New("CSV file tidak ada isinya")
-	}
-
+	// Parse CSV content
 	reader := csv.NewReader(strings.NewReader(fileContent))
 	records, err := reader.ReadAll()
 	if err != nil {
-		return nil, errors.New("CSV file gagal diproses")
+		return nil, errors.New("failed to read CSV content: " + err.Error())
 	}
 
-	if len(records) == 0 || len(records[0]) == 0 {
-		return nil, errors.New("CSV file tidak valid karena tidak memiliki header row")
+	// Check if there are rows in the CSV
+	if len(records) < 2 {
+		return nil, errors.New("no data found in CSV")
 	}
 
+	// Create a map to store the processed data
+	result := make(map[string][]string)
+
+	// The first row is the header
 	headers := records[0]
-	data := make(map[string][]string)
 
-	for _, header := range headers {
-		data[header] = []string{}
-	}
-
-	for _, record := range records[1:] {
-		if len(record) != len(headers) {
-			return nil, errors.New("CSV file gagal diproses")
-		}
-		for i, value := range record {
-			data[headers[i]] = append(data[headers[i]], value)
+	// Iterate over the remaining rows to populate the map
+	for _, row := range records[1:] {
+		for i, value := range row {
+			// Ensure the column index exists in the header
+			if i < len(headers) {
+				header := headers[i]
+				result[header] = append(result[header], value)
+			}
 		}
 	}
 
-	return data, nil
+	return result, nil
 }

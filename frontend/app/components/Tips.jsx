@@ -18,6 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { motion } from "framer-motion";
 
 const energyTips = [
   {
@@ -92,7 +93,13 @@ export default function EnergyTipsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-bl from-green-300 to-green-100 py-16">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        {/* Judul Halaman */}
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 flex items-center justify-center space-x-4">
             <Leaf className="w-12 h-12 text-green-600 animate-pulse" />
             <span>Tips Hemat Energi</span>
@@ -103,50 +110,63 @@ export default function EnergyTipsPage() {
             menghemat biaya, dan berkontribusi pada lingkungan yang lebih
             berkelanjutan.
           </p>
-        </div>
+        </motion.div>
 
+        {/* Grid Kartu Tips */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {energyTips.map((category, index) => (
-            <Card
+            <motion.div
               key={index}
-              className="group hover:shadow-xl transition-all duration-300 hover:scale-105 hover:border-green-500/50 border-2 border-transparent"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              viewport={{ once: true }}
             >
-              <CardHeader>
-                <div className="flex items-center space-x-4">
-                  <category.icon className={`w-10 h-10 ${category.color}`} />
-                  <CardTitle className="text-xl">{category.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger className="hover:no-underline group-hover:text-green-600 transition-colors">
-                      <span className="flex items-center space-x-2">
-                        <CheckCircle2 className="w-5 h-5 text-green-500" />
-                        <span>Lihat Tips</span>
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <ul className="space-y-3 text-sm text-gray-700">
-                        {category.tips.map((tip, tipIndex) => (
-                          <li
-                            key={tipIndex}
-                            className="flex items-start space-x-3"
-                          >
-                            <Zap className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                            <span className="leading-relaxed">{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </CardContent>
-            </Card>
+              <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 hover:border-green-500/50 border-2 border-transparent">
+                <CardHeader>
+                  <div className="flex items-center space-x-4">
+                    <category.icon className={`w-10 h-10 ${category.color}`} />
+                    <CardTitle className="text-xl">{category.title}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="item-1">
+                      <AccordionTrigger className="hover:no-underline group-hover:text-green-600 transition-colors">
+                        <span className="flex items-center space-x-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <span>Lihat Tips</span>
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <ul className="space-y-3 text-sm text-gray-700">
+                          {category.tips.map((tip, tipIndex) => (
+                            <li
+                              key={tipIndex}
+                              className="flex items-start space-x-3"
+                            >
+                              <Zap className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                              <span className="leading-relaxed">{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
-        <div className="mt-16 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-10 text-center">
+        {/* Bagian Penutup */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="mt-16 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-10 text-center"
+        >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 flex items-center justify-center space-x-4">
             <Leaf className="w-10 h-10 text-green-600 animate-bounce" />
             <span>Mengapa Hemat Energi Penting?</span>
@@ -158,7 +178,7 @@ export default function EnergyTipsPage() {
             mengurangi emisi karbon dan melestarikan lingkungan untuk generasi
             mendatang.
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

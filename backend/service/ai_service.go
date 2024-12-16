@@ -4,11 +4,9 @@ import (
 	"a21hc3NpZ25tZW50/model"
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io"
-	"log"
 	"net/http"
-	"time"
 )
 
 type HTTPClient interface {
@@ -19,101 +17,126 @@ type AIService struct {
 	Client HTTPClient
 }
 
+//  AnalyzeData mengirimkan permintaan ke endpoint AI untuk menganalisis data tabel berdasarkan query.
 func (s *AIService) AnalyzeData(table map[string][]string, query, token string) (string, error) {
+	// periksa apakah tabel kosong?
     if len(table) == 0 {
-        return "", fmt.Errorf("data table kosong")
+        return "", errors.New("table is empty")
     }
-
-    requestBody, err := json.Marshal(model.AIRequest{
+// buat request  body sesuai dengan struktur model 
+    requestBody := model.AIRequest{
         Inputs: model.Inputs{
             Table: table,
             Query: query,
         },
-    })
-    if err != nil {
-        return "", err
     }
-
-    req, err := http.NewRequest("POST", "https://api-inference.huggingface.co/models/google/tapas-large-finetuned-wtq", bytes.NewBuffer(requestBody))
+	//  Marshal request body ke dalam format JSON
+    body, err := json.Marshal(requestBody)
     if err != nil {
-        return "", err
+        return "", errors.New("failed to marshal request body: " + err.Error())
     }
-
-    req.Header.Set("Authorization", "Bearer "+token)
+	// Buat HTTP request POST ke endpoint Hugging Face ai model Tapas 
+    req, err := http.NewRequest("POST", "https://api-inference.huggingface.co/models/google/tapas-large-finetuned-wtq", bytes.NewBuffer(body))
+    if err != nil {
+        return "", errors.New("failed to create HTTP request: " + err.Error())
+    }
+	// tamabahin header untuk Auth dan Content Type 
     req.Header.Set("Content-Type", "application/json")
+    req.Header.Set("Authorization", "Bearer "+token)
 
-    log.Printf("Payload: %s\n", string(requestBody))
-    for retries := 0; retries < 3; retries++ {
-        resp, err := s.Client.Do(req)
-        if err != nil {
-            log.Printf("Error making request to Hugging Face API: %v", err)
-            continue
-        }
-        defer resp.Body.Close()
+	// kirim request menggunkana Http Client 
+    resp, err := s.Client.Do(req)
+    if err != nil {
+        return "", errors.New("failed to send HTTP request: " + err.Error())
+    }
+    defer resp.Body.Close() 
 
-        if resp.StatusCode != http.StatusOK {
-            bodyBytes, _ := io.ReadAll(resp.Body)
-            return "", fmt.Errorf("failed to get response from AI model: %s", string(bodyBytes))
-        }
-
-        var response model.TapasResponse
-        if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-            return "", err
-        }
-
-        return response.Answer, nil
+	// periksa status kode 
+    if resp.StatusCode != http.StatusOK {
+        return "", errors.New("received non-200 response: " + resp.Status)
     }
 
-    return "", fmt.Errorf("failed to get response from AI model after several retries")
+	// baca isi respon body 
+    responseBody, err := io.ReadAll(resp.Body)
+    if err != nil {
+        return "", errors.New("failed to read response body: " + err.Error())
+    }
+
+	// parse respon JSON ke dalam struktur Map 
+    var tapasResponse map[string]interface{}
+    err = json.Unmarshal(responseBody, &tapasResponse)
+    if err != nil {
+        return "", errors.New("failed to unmarshal response: " + err.Error())
+    }
+
+    // Update this to match the response body structure
+    answer, exists := tapasResponse["cells"].([]interface{})
+    if !exists {
+        return "", errors.New("no answer found in the response")
+    }
+
+    // Assuming the result is a string within the cells array
+    if len(answer) > 0 {
+        return answer[0].(string), nil
+    }
+    
+    return "", errors.New("no valid answer in the response")
 }
 
+//  ChatWithAI mengirimkan permintaan ke model Phi-3.5-mini-instruct di Hugging Face
 func (s *AIService) ChatWithAI(context, query, token string) (model.ChatResponse, error) {
-    requestBody, err := json.Marshal(map[string]string{
-        "inputs": context + " " + query,
-    })
-    if err != nil {
-        return model.ChatResponse{}, err
-    }
+	// Gabungkan konteks dan query jika perlu
+	input := context + "\n" + query
 
-    req, err := http.NewRequest("POST", "https://api-inference.huggingface.co/models/microsoft/Phi-3.5-mini-instruct", bytes.NewBuffer(requestBody))
-    if err != nil {
-        return model.ChatResponse{}, err
-    }
+	// Buat request body
+	requestBody := map[string]string{
+		"inputs": input,
+	}
+	body, err := json.Marshal(requestBody)
+	if err != nil {
+		return model.ChatResponse{}, errors.New("failed to marshal request body: " + err.Error())
+	}
 
-    req.Header.Set("Authorization", "Bearer "+token)
-    req.Header.Set("Content-Type", "application/json")
+	// Buat HTTP request ke endpoint Hugging Face model Microsoft phi 3.5 
+	req, err := http.NewRequest("POST", "https://api-inference.huggingface.co/models/microsoft/Phi-3.5-mini-instruct", bytes.NewBuffer(body))
+	if err != nil {
+		return model.ChatResponse{}, errors.New("failed to create HTTP request: " + err.Error())
+	}
+	// Tambahkan header untuk Authorization dan Content-Type
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
 
-    for retries := 0; retries < 3; retries++ {
-        resp, err := s.Client.Do(req)
-        if err != nil {
-            log.Printf("Error making request to Hugging Face API: %v", err)
-            time.Sleep(5 * time.Second)
-            continue
-        }
-        defer resp.Body.Close()
+	// Kirimkan request menggunakan HTTPClient
+	resp, err := s.Client.Do(req)
+	if err != nil {
+		return model.ChatResponse{}, errors.New("failed to send HTTP request: " + err.Error())
+	}
+	defer resp.Body.Close()
 
-        if resp.StatusCode == http.StatusServiceUnavailable {
-            log.Printf("Service unavailable, retrying...")
-            time.Sleep(5 * time.Second)
-            continue
-        }
+	// Periksa status kode
+	if resp.StatusCode != http.StatusOK {
+		return model.ChatResponse{}, errors.New("received non-200 response: " + resp.Status)
+	}
 
-        if resp.StatusCode != http.StatusOK {
-            bodyBytes, _ := io.ReadAll(resp.Body)
-            return model.ChatResponse{}, fmt.Errorf("failed to get response from AI model: %s", string(bodyBytes))
-        }
+	// Baca response body
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return model.ChatResponse{}, errors.New("failed to read response body: " + err.Error())
+	}
 
-        var responses []model.ChatResponse
-        if err := json.NewDecoder(resp.Body).Decode(&responses); err != nil {
-            return model.ChatResponse{}, err
-        }
+	// Parse response yang merupakan array JSON, dan ambil generated_text dari elemen pertama
+	var chatResponse []map[string]string
+	err = json.Unmarshal(responseBody, &chatResponse)
+	if err != nil {
+		return model.ChatResponse{}, errors.New("failed to unmarshal response: " + err.Error())
+	}
 
-        if len(responses) == 0 {
-            return model.ChatResponse{}, fmt.Errorf("no response from AI model")
-        }
+	// Jika response array tidak kosong, ambil generated_text dari elemen pertama
+	if len(chatResponse) > 0 {
+		return model.ChatResponse{
+			GeneratedText: chatResponse[0]["generated_text"],
+		}, nil
+	}
 
-        return responses[0], nil
-    }
-
-    return model.ChatResponse{}, fmt.Errorf("failed to get response from AI model after several retries")
+	return model.ChatResponse{}, errors.New("no response from AI")
 }

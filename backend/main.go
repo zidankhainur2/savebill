@@ -42,64 +42,92 @@ func main() {
 	router := mux.NewRouter()
 
 	// File upload endpoint
-	router.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
-		// Baca file dari request
-		file, _, err := r.FormFile("file")
-		if err != nil {
-			http.Error(w, "Invalid file", http.StatusBadRequest)
-			return
-		}
-		defer file.Close()
+    router.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
+        // Parse form data untuk file dan query
+        err := r.ParseMultipartForm(10 << 20) // Maksimum ukuran file 10MB
+        if err != nil {
+            http.Error(w, "Unable to parse form: "+err.Error(), http.StatusBadRequest)
+            return
+        }
+    
+        // Ambil file dari form
+        file, _, err := r.FormFile("file")
+        if err != nil {
+            http.Error(w, "Unable to retrieve file: "+err.Error(), http.StatusBadRequest)
+            return
+        }
+        defer file.Close()
+    
+        // Baca konten file
+        fileContent, err := io.ReadAll(file)
+        if err != nil {
+            http.Error(w, "Unable to read file: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+    
+        // Ambil query dari form
+        query := r.FormValue("query")
+        if query == "" {
+            http.Error(w, "Query is required", http.StatusBadRequest)
+            return
+        }
+    
+        // Proses konten file menggunakan service
+        processedData, err := fileService.ProcessFile(string(fileContent))
+        if err != nil {
+            http.Error(w, "Failed to process file: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+    
+        // Analisis data menggunakan layanan AI
+        analysisResult, err := aiService.AnalyzeData(processedData, query, token)
+        if err != nil {
+            http.Error(w, "Failed to analyze data: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+    
+        // Berikan hasil analisis sebagai respons JSON
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(map[string]string{
+            "status": "success",
+            "answer": analysisResult,
+        })
+    }).Methods("POST")
+    
 
-		// Baca isi file
-		fileContent, err := io.ReadAll(file)
-		if err != nil {
-			http.Error(w, "Error reading file", http.StatusInternalServerError)
-			return
-		}
+// Chat endpoint
+router.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
+    // Parse the request body
+    var requestBody struct {
+       Query string `json:query`
+    }
+    if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+        http.Error(w, "Invalid request body", http.StatusBadRequest)
+        return
+    }
 
-		// Proses file
-		data, err := fileService.ProcessFile(string(fileContent))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
+    // Retrieve the chat session context
+    session := getSession(r)
+    context, _ := session.Values["context"].(string)
 
-		// Analisa data
-		answer, err := aiService.AnalyzeData(data, "query", token)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+    // Perform the chat with AI
+    chatResponse, err := aiService.ChatWithAI(context, requestBody.Query, token)
+    if err != nil {
+        http.Error(w, "Failed to chat with AI: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
 
-		// Kirim response
-		response := map[string]string{"status": "success", "answer": answer}
-		json.NewEncoder(w).Encode(response)
-	}).Methods("POST")
+    // Update the chat session context
+    session.Values["context"] = context + "\n" + requestBody.Query + "\n" + chatResponse.GeneratedText
+    session.Save(r, w)
 
-	// Chat endpoint
-	router.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
-		// Baca input dari request
-		var input struct {
-			Context string `json:"context"`
-			Query   string `json:"query"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-			http.Error(w, "Invalid input", http.StatusBadRequest)
-			return
-		}
-
-		// Chat dengan AI
-		result, err := aiService.ChatWithAI(input.Context, input.Query, token)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		// Kirim response
-		response := map[string]string{"status": "success", "answer": result.GeneratedText}
-		json.NewEncoder(w).Encode(response)
-	}).Methods("POST")
+    // Return the chat response as JSON
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]string{
+        "status": "success",
+        "answer": chatResponse.GeneratedText,
+    })
+}).Methods("POST")
 
 	// Enable CORS
 	corsHandler := cors.New(cors.Options{

@@ -29,7 +29,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <Image
-            src="/logo.png"
+            src="/logo3.png"
             alt="Logo"
             width={120}
             height={40}

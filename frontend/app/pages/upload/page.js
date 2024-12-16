@@ -1,42 +1,50 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, FileText, Check, AlertTriangle } from "lucide-react";
+import { Upload, FileText, Check, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import Navbar from "@/app/components/Navbar";
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
 export default function UploadPage() {
   const [file, setFile] = useState(null);
-  const [question, setQuestion] = useState(""); // State untuk pertanyaan
-  const [loading, setLoading] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState(null);
+  const [fileQuestion, setFileQuestion] = useState("");
+  const [query, setQuery] = useState("");
+  const [chatResponses, setChatResponses] = useState([]);
   const [uploadHistory, setUploadHistory] = useState([]);
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  const [loadingChat, setLoadingChat] = useState(false);
   const fileInputRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
-  const handleFileChange = (e) => {
-    const uploadedFile = e.target.files[0];
-    if (!uploadedFile) return;
-
+  // Validasi File
+  const validateFile = (uploadedFile) => {
+    if (!uploadedFile) return false;
     if (uploadedFile.type !== "text/csv") {
       toast({
         title: "Kesalahan Format File",
         description: "Hanya file CSV yang diizinkan.",
         variant: "destructive",
       });
-      return;
+      return false;
     }
-
     if (uploadedFile.size > 5 * 1024 * 1024) {
       toast({
         title: "Kesalahan Ukuran File",
         description: "Ukuran file terlalu besar. Maksimal 5MB.",
         variant: "destructive",
       });
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const handleFileChange = (e) => {
+    const uploadedFile = e.target.files[0];
+    if (!validateFile(uploadedFile)) return;
 
     setFile(uploadedFile);
     toast({
@@ -46,12 +54,9 @@ export default function UploadPage() {
     });
   };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
+  // Handle Upload File
   const handleUpload = async () => {
-    if (!file || !question.trim()) {
+    if (!file || !fileQuestion.trim()) {
       toast({
         title: "Data Tidak Lengkap",
         description: "Silakan unggah file CSV dan masukkan pertanyaan.",
@@ -60,31 +65,23 @@ export default function UploadPage() {
       return;
     }
 
-    setLoading(true);
+    setLoadingUpload(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("query", fileQuestion);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("question", question); // Tambahkan pertanyaan
-
       const response = await fetch("http://localhost:8080/upload", {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error("Gagal mengunggah data.");
-      }
-
+      if (!response.ok) throw new Error("Gagal mengunggah file.");
       const data = await response.json();
 
-      // Set hasil analisis
-      setAnalysisResult(data.answer);
-
-      // Tambahkan ke riwayat
       setUploadHistory((prev) => [
         ...prev,
-        { name: file.name, question, result: data.answer },
+        { name: file.name, question: fileQuestion, result: data.answer },
       ]);
 
       toast({
@@ -93,140 +90,156 @@ export default function UploadPage() {
         variant: "success",
       });
 
-      // Reset input file dan pertanyaan
       setFile(null);
-      setQuestion("");
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      setFileQuestion("");
+      fileInputRef.current.value = "";
     } catch (error) {
       toast({
         title: "Kesalahan Unggahan",
-        description: error.message,
+        description: error.message || "Gagal mengunggah file.",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setLoadingUpload(false);
     }
   };
 
+  // Handle Chat Interaction
+  const handleChat = async () => {
+    if (!query.trim()) return;
+
+    setLoadingChat(true);
+    try {
+      const response = await fetch("http://localhost:8080/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+      if (!response.ok) throw new Error("Gagal mengirim pesan.");
+
+      const data = await response.json();
+      setChatResponses((prev) => [
+        ...prev,
+        { sender: "user", text: query },
+        { sender: "ai", text: data.answer },
+      ]);
+      setQuery("");
+      scrollToBottom();
+    } catch (error) {
+      toast({
+        title: "Kesalahan Chat",
+        description: error.message || "Gagal mengirim pesan.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingChat(false);
+    }
+  };
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      chatContainerRef.current?.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 100);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
-      <div className="container mx-auto px-4 py-12">
-        <motion.div
-          className="max-w-md mx-auto shadow-xl"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-center space-x-2">
-                <FileText className="w-8 h-8 text-blue-600" />
-                <span className="text-2xl font-bold text-gray-800">
-                  Unggah Data CSV
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <motion.div
-                onClick={triggerFileInput}
-                className={`border-2 border-dashed rounded-lg p-6 mb-4 text-center cursor-pointer 
-                  transition-all duration-300 ${
-                    file
-                      ? "border-green-500 bg-green-50 hover:bg-green-100"
-                      : "border-blue-300 bg-blue-50 hover:bg-blue-100 hover:border-blue-500"
+      <div className="container mx-auto p-4 flex flex-col gap-6">
+        {/* Upload Card */}
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>Unggah Data CSV</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="border-2 border-dashed rounded-lg p-6 mb-4 text-center cursor-pointer hover:border-blue-500"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {file ? (
+                <Check className="text-green-600" />
+              ) : (
+                <Upload className="text-blue-500" />
+              )}
+              <p>{file ? file.name : "Klik untuk memilih file CSV"}</p>
+            </motion.div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".csv"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <Input
+              value={fileQuestion}
+              onChange={(e) => setFileQuestion(e.target.value)}
+              placeholder="Masukkan pertanyaan..."
+              className="mb-4"
+            />
+            <Button
+              className="bg-green-500"
+              onClick={handleUpload}
+              disabled={loadingUpload || !fileQuestion.trim()}
+            >
+              {loadingUpload ? "Mengunggah..." : "Unggah File"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Chat Card */}
+        <Card className="shadow-lg flex-grow">
+          <CardHeader>
+            <CardTitle>Chat dengan AI</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col h-96">
+            <div
+              ref={chatContainerRef}
+              className="flex-grow overflow-y-auto p-2 space-y-3"
+            >
+              {chatResponses.map((response, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`flex ${
+                    response.sender === "user" ? "justify-end" : "justify-start"
                   }`}
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept=".csv"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                {file ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <Check className="w-6 h-6 text-green-600" />
-                    <span className="text-green-700">{file.name}</span>
+                >
+                  <div
+                    className={`rounded-lg p-3 max-w-md shadow-lg ${
+                      response.sender === "user"
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-800"
+                    }`}
+                  >
+                    {response.text}
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <Upload className="w-12 h-12 text-blue-600 mb-2" />
-                    <p className="text-gray-600">Klik untuk memilih file CSV</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Ukuran maks: 5MB
-                    </p>
-                  </div>
-                )}
-              </motion.div>
+                </motion.div>
+              ))}
+            </div>
 
-              <motion.textarea
-                placeholder="Masukkan pertanyaan terkait data Anda..."
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                className="w-full border p-3 rounded-lg mb-4 resize-none"
-                rows="4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              ></motion.textarea>
-
+            <div className="flex items-center gap-2">
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Ketik pesan Anda..."
+                disabled={loadingChat}
+              />
               <Button
-                onClick={handleUpload}
-                disabled={!file || loading}
-                className="w-full"
+                className="bg-green-500"
+                onClick={handleChat}
+                disabled={loadingChat || !query.trim()}
               >
-                {loading ? (
-                  <div className="flex items-center space-x-2">
-                    <AlertTriangle className="w-5 h-5 animate-pulse" />
-                    <span>Sedang Mengunggah...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <Upload className="w-5 h-5" />
-                    <span>Unggah Data</span>
-                  </div>
-                )}
+                {loadingChat ? "Mengirim..." : <Send />}
               </Button>
-
-              {analysisResult && (
-                <motion.div
-                  className="mt-6 p-4 border rounded-lg bg-blue-50 text-gray-700"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <h3 className="font-bold text-lg">Hasil Analisis:</h3>
-                  <p>{analysisResult}</p>
-                </motion.div>
-              )}
-
-              {uploadHistory.length > 0 && (
-                <motion.div
-                  className="mt-8"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <h3 className="font-bold text-lg">Riwayat Unggahan:</h3>
-                  <ul className="list-disc list-inside mt-4 space-y-2">
-                    {uploadHistory.map((history, index) => (
-                      <li key={index} className="text-gray-700">
-                        <span className="font-medium">{history.name}</span>:{" "}
-                        <strong>{history.question}</strong> → {history.result}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
