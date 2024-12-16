@@ -56,13 +56,13 @@ export default function IndonesiaElectricityAccessMap() {
   const [viewMode, setViewMode] = useState("region");
 
   const getColorIntensity = (percentage) => {
-    if (percentage >= 99) return "#00ff00";
-    if (percentage >= 95) return "#7cfc00";
-    if (percentage >= 90) return "#32cd32";
-    if (percentage >= 80) return "#90ee90";
-    if (percentage >= 70) return "#ffd700";
-    if (percentage >= 50) return "#ffa500";
-    return "#ff4500";
+    if (percentage >= 99) return "#00ff00"; // green for high access
+    if (percentage >= 95) return "#7cfc00"; // lighter green
+    if (percentage >= 90) return "#32cd32"; // medium green
+    if (percentage >= 80) return "#90ee90"; // light green
+    if (percentage >= 70) return "#ffd700"; // yellow
+    if (percentage >= 50) return "#ffa500"; // orange
+    return "#ff4500"; // red for low access
   };
 
   const averageAccess =
@@ -76,31 +76,33 @@ export default function IndonesiaElectricityAccessMap() {
   );
 
   return (
-    <div className="bg-gradient-to-br from-green-100 to-green-300 min-h-screen py-12">
+    <div className="bg-gradient-to-br from-black to-gray-900 min-h-screen py-12 text-yellow-400">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 flex items-center justify-center space-x-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-yellow-400 mb-4 flex items-center justify-center space-x-4">
             <Zap className="w-12 h-12 text-yellow-500 animate-pulse" />
             <span>Akses Listrik PLN Indonesia 2024</span>
             <Globe className="w-12 h-12 text-green-600 animate-pulse" />
           </h1>
-          <p className="text-xl text-gray-700 max-w-4xl mx-auto">
+          <p className="text-xl text-gray-200 max-w-4xl mx-auto">
             Pemetaan Persentase Rumah Tangga dengan Akses Listrik PLN
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 shadow-lg">
+          <Card className="lg:col-span-2 shadow-lg bg-gray-800 border border-yellow-400">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Peta Akses Listrik PLN</CardTitle>
+                <CardTitle className="text-yellow-400">
+                  Peta Akses Listrik PLN
+                </CardTitle>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => setViewMode("region")}
                     className={`px-4 py-2 rounded-md ${
                       viewMode === "region"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200"
+                        ? "bg-yellow-500 text-black"
+                        : "bg-gray-700 text-yellow-400"
                     } transition-colors duration-300`}
                   >
                     Berdasar Wilayah
@@ -109,8 +111,8 @@ export default function IndonesiaElectricityAccessMap() {
                     onClick={() => setViewMode("persentase")}
                     className={`px-4 py-2 rounded-md ${
                       viewMode === "persentase"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200"
+                        ? "bg-yellow-500 text-black"
+                        : "bg-gray-700 text-yellow-400"
                     } transition-colors duration-300`}
                   >
                     Persentase
@@ -119,7 +121,7 @@ export default function IndonesiaElectricityAccessMap() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="w-full bg-white rounded-lg p-4">
+              <div className="w-full bg-gray-700 rounded-lg p-4">
                 {viewMode === "region" ? (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {electricityAccessData
@@ -148,10 +150,12 @@ export default function IndonesiaElectricityAccessMap() {
                             ),
                           }}
                         >
-                          <h3 className="font-semibold text-lg">
+                          <h3 className="font-semibold text-lg text-yellow-400">
                             {region.region}
                           </h3>
-                          <p>{region.persentase.toFixed(2)}%</p>
+                          <p className="text-yellow-300">
+                            {region.persentase.toFixed(2)}%
+                          </p>
                         </div>
                       ))}
                   </div>
@@ -169,10 +173,12 @@ export default function IndonesiaElectricityAccessMap() {
                             ),
                           }}
                         >
-                          <h3 className="font-semibold text-lg">
+                          <h3 className="font-semibold text-lg text-yellow-400">
                             {provinsi.provinsi}
                           </h3>
-                          <p>{provinsi.persentase}%</p>
+                          <p className="text-yellow-300">
+                            {provinsi.persentase}%
+                          </p>
                         </div>
                       ))}
                   </div>
@@ -181,47 +187,51 @@ export default function IndonesiaElectricityAccessMap() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-gray-800 border border-yellow-400">
             <CardHeader>
-              <CardTitle>Statistik Akses Listrik</CardTitle>
+              <CardTitle className="text-yellow-400">
+                Statistik Akses Listrik
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-blue-600">
+                  <h3 className="text-2xl font-bold text-yellow-400">
                     {averageAccess.toFixed(2)}%
                   </h3>
-                  <p className="text-sm text-gray-600">Rata-rata Nasional</p>
+                  <p className="text-sm text-gray-200">Rata-rata Nasional</p>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-green-600">
+                  <h3 className="text-2xl font-bold text-yellow-500">
                     {highestAccess.toFixed(2)}%
                   </h3>
-                  <p className="text-sm text-gray-600">Tertinggi</p>
+                  <p className="text-sm text-gray-200">Tertinggi</p>
                 </div>
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-yellow-600">
                     {lowestAccess.toFixed(2)}%
                   </h3>
-                  <p className="text-sm text-gray-600">Terendah</p>
+                  <p className="text-sm text-gray-200">Terendah</p>
                 </div>
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-red-600">
+                  <h3 className="text-2xl font-bold text-yellow-700">
                     {
                       electricityAccessData.filter(
                         (item) => item.persentase < 90
                       ).length
                     }
                   </h3>
-                  <p className="text-sm text-gray-600">Provinsi di Bawah 90%</p>
+                  <p className="text-sm text-gray-200">Provinsi di Bawah 90%</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-3 shadow-lg">
+          <Card className="lg:col-span-3 shadow-lg bg-gray-800 border border-yellow-400">
             <CardHeader>
-              <CardTitle>Provinsi dengan Akses Listrik Rendah</CardTitle>
+              <CardTitle className="text-yellow-400">
+                Provinsi dengan Akses Listrik Rendah
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -231,15 +241,15 @@ export default function IndonesiaElectricityAccessMap() {
                   .map((provinsi) => (
                     <div
                       key={provinsi.provinsi}
-                      className="p-4 bg-white rounded-lg shadow-md border-l-4 border-red-500"
+                      className="p-4 bg-gray-700 rounded-lg shadow-md border-l-4 border-red-500"
                     >
-                      <h3 className="font-semibold text-lg">
+                      <h3 className="font-semibold text-lg text-yellow-400">
                         {provinsi.provinsi}
                       </h3>
                       <p className="text-red-600 font-semibold">
                         {provinsi.persentase}% Akses Listrik
                       </p>
-                      <p className="text-gray-600">{provinsi.region}</p>
+                      <p className="text-gray-200">{provinsi.region}</p>
                     </div>
                   ))}
               </div>

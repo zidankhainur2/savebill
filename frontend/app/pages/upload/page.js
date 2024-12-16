@@ -146,26 +146,28 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-black text-white">
       <Navbar />
-      <div className="container mx-auto p-4 flex flex-col gap-6">
+      <div className="container mx-auto p-6 flex flex-col gap-6 pt-20">
         {/* Upload Card */}
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-gray-800 border border-gray-700">
           <CardHeader>
-            <CardTitle>Unggah Data CSV</CardTitle>
+            <CardTitle className="text-yellow-500">Unggah Data CSV</CardTitle>
           </CardHeader>
           <CardContent>
             <motion.div
               whileHover={{ scale: 1.02 }}
-              className="border-2 border-dashed rounded-lg p-6 mb-4 text-center cursor-pointer hover:border-blue-500"
+              className="border-2 border-dashed rounded-lg p-6 mb-4 text-center cursor-pointer hover:border-yellow-500"
               onClick={() => fileInputRef.current?.click()}
             >
               {file ? (
-                <Check className="text-green-600" />
+                <Check className="text-yellow-500 w-8 h-8 mx-auto" />
               ) : (
-                <Upload className="text-blue-500" />
+                <Upload className="text-yellow-500 w-8 h-8 mx-auto" />
               )}
-              <p>{file ? file.name : "Klik untuk memilih file CSV"}</p>
+              <p className="mt-2 text-yellow-500">
+                {file ? file.name : "Klik untuk memilih file CSV"}
+              </p>
             </motion.div>
             <input
               type="file"
@@ -178,12 +180,12 @@ export default function UploadPage() {
               value={fileQuestion}
               onChange={(e) => setFileQuestion(e.target.value)}
               placeholder="Masukkan pertanyaan..."
-              className="mb-4"
+              className="mb-4 bg-gray-700 text-white border-gray-600 focus:border-yellow-500"
             />
             <Button
-              className="bg-green-500"
               onClick={handleUpload}
               disabled={loadingUpload || !fileQuestion.trim()}
+              className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
             >
               {loadingUpload ? "Mengunggah..." : "Unggah File"}
             </Button>
@@ -191,9 +193,9 @@ export default function UploadPage() {
         </Card>
 
         {/* Chat Card */}
-        <Card className="shadow-lg flex-grow">
+        <Card className="shadow-lg bg-gray-800 border border-gray-700 flex-grow">
           <CardHeader>
-            <CardTitle>Chat dengan AI</CardTitle>
+            <CardTitle className="text-yellow-500">Chat dengan AI</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col h-96">
             <div
@@ -213,8 +215,8 @@ export default function UploadPage() {
                   <div
                     className={`rounded-lg p-3 max-w-md shadow-lg ${
                       response.sender === "user"
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-200 text-gray-800"
+                        ? "bg-yellow-500 text-black"
+                        : "bg-gray-700 text-white"
                     }`}
                   >
                     {response.text}
@@ -223,19 +225,20 @@ export default function UploadPage() {
               ))}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mt-4">
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Ketik pesan Anda..."
                 disabled={loadingChat}
+                className="bg-gray-700 text-white border-gray-600 focus:border-yellow-500"
               />
               <Button
-                className="bg-green-500"
                 onClick={handleChat}
                 disabled={loadingChat || !query.trim()}
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
               >
-                {loadingChat ? "Mengirim..." : <Send />}
+                {loadingChat ? "Mengirim..." : <Send className="w-5 h-5" />}
               </Button>
             </div>
           </CardContent>

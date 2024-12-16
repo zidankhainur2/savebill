@@ -91,7 +91,7 @@ const energyTips = [
 
 export default function EnergyTipsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-bl from-green-300 to-green-100 py-16">
+    <div className="min-h-screen bg-black text-white py-16">
       <div className="container mx-auto px-4">
         {/* Judul Halaman */}
         <motion.div
@@ -100,12 +100,12 @@ export default function EnergyTipsPage() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 flex items-center justify-center space-x-4">
-            <Leaf className="w-12 h-12 text-green-600 animate-pulse" />
+          <h1 className="text-4xl md:text-5xl font-bold text-yellow-500 mb-6 flex items-center justify-center space-x-4">
+            <Leaf className="w-12 h-12 text-yellow-500 animate-pulse" />
             <span>Tips Hemat Energi</span>
             <Zap className="w-12 h-12 text-yellow-500 animate-pulse" />
           </h1>
-          <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
             Temukan strategi praktis untuk mengurangi konsumsi listrik,
             menghemat biaya, dan berkontribusi pada lingkungan yang lebih
             berkelanjutan.
@@ -122,30 +122,32 @@ export default function EnergyTipsPage() {
               transition={{ duration: 0.6, delay: index * 0.2 }}
               viewport={{ once: true }}
             >
-              <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 hover:border-green-500/50 border-2 border-transparent">
+              <Card className="group hover:shadow-xl transition-all duration-300 hover:scale-105 hover:border-yellow-500/50 border-2 border-transparent">
                 <CardHeader>
                   <div className="flex items-center space-x-4">
                     <category.icon className={`w-10 h-10 ${category.color}`} />
-                    <CardTitle className="text-xl">{category.title}</CardTitle>
+                    <CardTitle className="text-xl text-yellow-500">
+                      {category.title}
+                    </CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <Accordion type="single" collapsible>
                     <AccordionItem value="item-1">
-                      <AccordionTrigger className="hover:no-underline group-hover:text-green-600 transition-colors">
+                      <AccordionTrigger className="hover:no-underline group-hover:text-yellow-500 transition-colors">
                         <span className="flex items-center space-x-2">
-                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <CheckCircle2 className="w-5 h-5 text-yellow-500" />
                           <span>Lihat Tips</span>
                         </span>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <ul className="space-y-3 text-sm text-gray-700">
+                        <ul className="space-y-3 text-sm text-gray-300">
                           {category.tips.map((tip, tipIndex) => (
                             <li
                               key={tipIndex}
                               className="flex items-start space-x-3"
                             >
-                              <Zap className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                              <Zap className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
                               <span className="leading-relaxed">{tip}</span>
                             </li>
                           ))}
@@ -165,14 +167,14 @@ export default function EnergyTipsPage() {
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="mt-16 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg p-10 text-center"
+          className="mt-16 bg-white/20 backdrop-blur-md rounded-2xl shadow-lg p-10 text-center"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 flex items-center justify-center space-x-4">
-            <Leaf className="w-10 h-10 text-green-600 animate-bounce" />
+          <h2 className="text-3xl md:text-4xl font-bold text-yellow-500 mb-6 flex items-center justify-center space-x-4">
+            <Leaf className="w-10 h-10 text-yellow-500 animate-bounce" />
             <span>Mengapa Hemat Energi Penting?</span>
-            <Leaf className="w-10 h-10 text-green-600 animate-bounce" />
+            <Leaf className="w-10 h-10 text-yellow-500 animate-bounce" />
           </h2>
-          <p className="text-lg md:text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
             Dengan menerapkan tips hemat energi, Anda tidak hanya mengurangi
             biaya listrik, tetapi juga berkontribusi pada upaya global
             mengurangi emisi karbon dan melestarikan lingkungan untuk generasi

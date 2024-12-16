@@ -11,7 +11,6 @@ import EnergyVisualizationPage from "./components/VisualData";
 export default function HomePage() {
   return (
     <div className="bg-gradient-to-br from-black to-gray-900 min-h-screen text-yellow-400 overflow-x-hidden">
-      <Navbar />
       <main className="container mx-auto px-4 min-h-screen flex items-center justify-center">
         <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
           {/* Left Content Section */}
