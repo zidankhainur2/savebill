@@ -78,13 +78,25 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* <div id="visualData">
+      <div id="visualData">
         <EnergyVisualizationPage />
       </div>
+
+      {/* <div id="visualData">
+        <EnergyVisualizationPage data={sampleData}/>
+      </div>
+
+      
 
       <div id="tips" className="scroll-smooth">
         <EnergyTipsPage />
       </div> */}
+
+      {/* Visualisasi Data Section
+       <EnergyVisualizationPage data={sampleData} /> */}
+      <div id="tips" className="scroll-smooth">
+        <EnergyTipsPage />
+      </div>
     </div>
   );
 }
