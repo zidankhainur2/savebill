@@ -27,7 +27,16 @@ export const useChatStore = create(
       addResponse: (response) =>
         set((state) => ({ responses: [...state.responses, response] })),
       setError: (error) => set({ error }),
-      clearChat: () => set({ responses: [], file: null, fileContent: "" }),
+      // --- TAMBAHKAN FUNGSI INI ---
+      clearChat: () =>
+        set({
+          responses: [],
+          file: null,
+          fileContent: "",
+          question: "",
+          error: null,
+        }),
+      // --------------------------
     }),
     {
       name: "chat-storage", // Nama key di localStorage

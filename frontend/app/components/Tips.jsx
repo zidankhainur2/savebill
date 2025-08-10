@@ -1,76 +1,41 @@
-import {
-  Zap,
-  Lightbulb,
-  Home,
-  ThermometerSnowflake,
-  Droplet,
-  CreditCard,
-} from "lucide-react";
-import Navbar from "./Navbar";
+"use client";
 
-export default function EnergyTipsPage() {
-  const tips = [
-    {
-      icon: <Lightbulb className="w-8 h-8 text-yellow-500" />,
-      title: "Gunakan Lampu LED Hemat Energi",
-      description:
-        "Lampu LED lebih efisien dibandingkan lampu pijar konvensional dan dapat mengurangi konsumsi listrik hingga 80%.",
-    },
-    {
-      icon: <Home className="w-8 h-8 text-yellow-500" />,
-      title: "Matikan Perangkat Tidak Digunakan",
-      description:
-        "Cabut perangkat elektronik saat tidak digunakan untuk menghindari konsumsi listrik yang tidak perlu.",
-    },
-    {
-      icon: <ThermometerSnowflake className="w-8 h-8 text-yellow-500" />,
-      title: "Atur Suhu AC dengan Bijak",
-      description:
-        "Setel suhu AC di 24-26°C untuk menjaga keseimbangan antara kenyamanan dan efisiensi energi.",
-    },
-    {
-      icon: <Droplet className="w-8 h-8 text-yellow-500" />,
-      title: "Kurangi Penggunaan Air Panas",
-      description:
-        "Pemanas air listrik memakan banyak energi. Gunakan air dingin jika memungkinkan untuk menghemat listrik.",
-    },
-    {
-      icon: <Zap className="w-8 h-8 text-yellow-500" />,
-      title: "Rutin Periksa Konsumsi Energi",
-      description:
-        "Gunakan aplikasi atau alat pemantau listrik untuk memahami dan mengontrol pemakaian energi Anda.",
-    },
-    {
-      icon: <CreditCard className="w-8 h-8 text-yellow-500" />,
-      title: "Manajemen Biaya Listrik",
-      description: "Pantau penggunaan listrik secara berkala",
-    },
-  ];
+import { Lightbulb, Power, BatteryCharging } from "lucide-react";
 
+const tipsData = [
+  {
+    icon: <Lightbulb className="w-8 h-8 text-yellow-400" />,
+    title: "Gunakan Lampu LED",
+    description:
+      "Lampu LED mengonsumsi energi hingga 85% lebih sedikit dan bertahan lebih lama dibandingkan lampu pijar tradisional.",
+  },
+  {
+    icon: <Power className="w-8 h-8 text-yellow-400" />,
+    title: "Cabut Peralatan Elektronik",
+    description:
+      "Peralatan yang masih terhubung saat tidak digunakan (vampire power) dapat menyumbang hingga 10% dari tagihan listrik Anda.",
+  },
+  {
+    icon: <BatteryCharging className="w-8 h-8 text-yellow-400" />,
+    title: "Optimalkan Penggunaan AC",
+    description:
+      "Atur suhu AC pada 25°C dan bersihkan filternya secara teratur untuk menjaga efisiensi dan mengurangi konsumsi energi.",
+  },
+];
+
+export default function Tips() {
   return (
-    <div className="bg-gradient-to-br from-black to-gray-900 min-h-screen text-yellow-400">
-      <Navbar />
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-12">
-          Tips Menghemat Energi Listrik
-        </h1>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {tips.map((tip, index) => (
-            <div
-              key={index}
-              className="bg-gray-800 rounded-lg p-6 text-center shadow-lg hover:shadow-2xl transition duration-300"
-            >
-              <div className="flex items-center justify-center mb-4">
-                {tip.icon}
-              </div>
-              <h2 className="text-2xl font-semibold mb-4 text-yellow-500">
-                {tip.title}
-              </h2>
-              <p className="text-gray-300 leading-relaxed">{tip.description}</p>
-            </div>
-          ))}
+    <div className="w-full max-w-5xl mx-auto mt-12 grid md:grid-cols-3 gap-8">
+      {tipsData.map((tip, index) => (
+        <div
+          key={index}
+          className="p-8 bg-gray-800/50 rounded-lg border border-gray-700 flex flex-col items-center text-center"
+        >
+          <div className="mb-4">{tip.icon}</div>
+          <h3 className="text-xl font-semibold mb-2">{tip.title}</h3>
+          <p className="text-gray-400">{tip.description}</p>
         </div>
-      </div>
+      ))}
     </div>
   );
 }

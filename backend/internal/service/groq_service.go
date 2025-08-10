@@ -22,40 +22,61 @@ func NewGroqService() *GroqService {
 }
 
 // GenerateChatResponse membuat prompt dan mengirimkannya ke Groq API.
-// Kita tetap menerima 'ctx' sebagai parameter untuk best practice,
-// meskipun tidak digunakan langsung dalam pemanggilan client.
 func (s *GroqService) GenerateChatResponse(ctx context.Context, fileContent, question string) (string, error) {
 	if fileContent == "" || question == "" {
 		return "", errors.New("file content and question cannot be empty")
 	}
 
+	// Prompt pengguna tetap sederhana
 	prompt := fmt.Sprintf(`
-Berdasarkan data CSV berikut:
+Data CSV untuk dianalisis:
 ---
 %s
 ---
-Jawab pertanyaan ini: "%s"
 
-Berikan jawaban yang jelas dan ringkas.
+Pertanyaan dari pengguna: "%s"
 `, fileContent, question)
 
-	// --- PERBAIKAN DI BAWAH INI ---
-	resp, err := s.client.CreateChatCompletion(groq.CompletionCreateParams{
-		Model: "llama3-8b-8192",
-		Messages: []groq.Message{
-			{
-				Role:    "system",
-				Content: "Anda adalah asisten analis data yang membantu menganalisis data dari file CSV.",
+	// Inilah 'otak' dari AI kita. Instruksinya sekarang jauh lebih detail.
+	systemMessage := `Anda adalah "AI Analyst", seorang asisten analis data yang sangat ahli, ramah, dan komunikatif.
+
+### ATURAN UTAMA:
+1.  **BAHASA**: Ini adalah aturan paling penting. **WAJIB** balas dalam bahasa yang **SAMA** dengan bahasa yang digunakan dalam "Pertanyaan dari pengguna". Jangan pernah menggunakan bahasa lain. Jika pertanyaan dalam Bahasa Indonesia, balas 100% dalam Bahasa Indonesia.
+2.  **FORMAT**: Selalu gunakan format **Markdown** untuk membuat jawabanmu rapi dan mudah dibaca. Gunakan headings, bold, dan bullet points.
+3.  **TONE**: Jadilah seperti asisten yang membantu. Mulailah dengan sapaan ramah, berikan jawaban, lalu tutup dengan kalimat yang suportif.
+
+### CONTOH STRUKTUR JAWABAN:
+
+Tentu, ini analisis saya berdasarkan data yang Anda berikan.
+
+**[Judul Analisis yang Relevan]**
+
+Berdasarkan data CSV, jawaban untuk pertanyaan Anda adalah [jawaban langsung].
+
+Berikut adalah beberapa detail atau poin pendukung:
+* **Poin Penting 1**: [Penjelasan untuk poin 1].
+* **Poin Penting 2**: [Penjelasan untuk poin 2].
+* **Poin Penting 3**: [Penjelasan untuk poin 3].
+
+Semoga analisis ini membantu! Jika ada pertanyaan lain, jangan ragu untuk bertanya.
+`
+
+	resp, err := s.client.CreateChatCompletion(
+		groq.CompletionCreateParams{
+			Model: "llama3-8b-8192", // Model ini sangat baik dalam mengikuti instruksi
+			Messages: []groq.Message{
+				{
+					Role:    "system",
+					Content: systemMessage,
+				},
+				{
+					Role:    "user",
+					Content: prompt,
+				},
 			},
-			{
-				Role:    "user",
-				Content: prompt,
-			},
+			ResponseFormat: groq.ResponseFormat{Type: "text"},
 		},
-		// Perbaikan 2: Hapus simbol '&'
-		ResponseFormat: groq.ResponseFormat{Type: "text"},
-	})
-	// Perbaikan 1: 'ctx' dihapus dari pemanggilan fungsi di atas.
+	)
 
 	if err != nil {
 		return "", fmt.Errorf("failed to get response from Groq: %w", err)

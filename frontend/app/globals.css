@@ -75,3 +75,20 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* ... (kode yang sudah ada) */
+  .bg-grid-gray-700\/20 {
+    background-image: linear-gradient(
+        to right,
+        theme(colors.gray.700 / 0.2) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        theme(colors.gray.700 / 0.2) 1px,
+        transparent 1px
+      );
+    background-size: 3rem 3rem;
+  }
+}
