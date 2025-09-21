@@ -5,6 +5,7 @@ import (
 	"a21hc3NpZ25tZW50/internal/service"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -13,11 +14,8 @@ import (
 	"github.com/rs/cors"
 )
 
-// loadEnv mencari file .env berdasarkan lokasi main.go
 func loadEnv() {
-	// Ambil path file main.go yang sedang berjalan
 	_, b, _, _ := runtime.Caller(0)
-	// Naik 2 folder dari lokasi main.go (cmd/api) ke root project
 	envPath := filepath.Join(filepath.Dir(b), "../../.env")
 
 	// Load .env
@@ -30,26 +28,27 @@ func loadEnv() {
 }
 
 func main() {
-	// Muat .env
 	loadEnv()
 
-	// Inisialisasi services
 	fileService := service.NewFileService()
 	groqService := service.NewGroqService()
 
-	// Inisialisasi handlers
 	chatHandler := handler.NewChatHandler(fileService, groqService)
 
-	// Router
 	r := mux.NewRouter()
 	r.HandleFunc("/api/chat", chatHandler.HandleChat).Methods("POST")
 
-	// Middleware CORS
+	// Setup CORS
+	allowedOrigin := os.Getenv("ALLOWED_ORIGIN")
+	if allowedOrigin == "" {
+    	allowedOrigin = "http://localhost:3000" 
+	}
+
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"}, // Sesuaikan dengan URL frontend
-		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
-		AllowedHeaders:   []string{"Content-Type", "Authorization"},
-		AllowCredentials: true,
+    	AllowedOrigins:   []string{allowedOrigin}, 
+    	AllowedMethods:   []string{"POST", "GET", "OPTIONS"},
+    	AllowedHeaders:   []string{"Content-Type", "Authorization"},
+    	AllowCredentials: true,
 	})
 
 	handler := c.Handler(r)

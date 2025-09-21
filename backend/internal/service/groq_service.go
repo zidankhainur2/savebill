@@ -63,7 +63,7 @@ Semoga analisis ini membantu! Jika ada pertanyaan lain, jangan ragu untuk bertan
 
 	resp, err := s.client.CreateChatCompletion(
 		groq.CompletionCreateParams{
-			Model: "llama3-8b-8192", // Model ini sangat baik dalam mengikuti instruksi
+			Model: "llama-3.1-8b-instant", 
 			Messages: []groq.Message{
 				{
 					Role:    "system",

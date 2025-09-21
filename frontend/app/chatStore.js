@@ -5,9 +5,9 @@ export const useChatStore = create(
   persist(
     (set) => ({
       file: null,
-      fileContent: "", // Kita akan menyimpan konten file sebagai teks
+      fileContent: "", 
       question: "",
-      responses: [], // Format: [{ question: '...', answer: '...' }]
+      responses: [], 
       loading: false,
       error: null,
       setFile: (file) => {

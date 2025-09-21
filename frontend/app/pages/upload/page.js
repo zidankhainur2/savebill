@@ -237,7 +237,7 @@ export default function UploadPage() {
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 disabled={!file || loading}
-                className="bg-gray-700 text-base border-gray-600 focus-visible:ring-1 focus-visible:ring-yellow-400 resize-none h-12"
+                className="bg-gray-700 text-base text-white border-gray-600 focus-visible:ring-1 focus-visible:ring-yellow-400 resize-none h-12"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
