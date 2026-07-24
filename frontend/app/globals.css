@@ -4,91 +4,67 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: #F6F7F2;
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  background-color: #F6F7F2;
+  color: #18281F;
 }
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 20 14.3% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 20 14.3% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 14.3% 4.1%;
-    --primary: 47.9 95.8% 53.1%;
-    --primary-foreground: 26 83.3% 14.1%;
-    --secondary: 60 4.8% 95.9%;
-    --secondary-foreground: 24 9.8% 10%;
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5.3% 44.7%;
-    --accent: 60 4.8% 95.9%;
-    --accent-foreground: 24 9.8% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 20 14.3% 4.1%;
-    --radius: 0.75rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+@layer components {
+  /* Glassmorphism card utility inspired by Sunrock ref-design2.png */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 10px 30px -5px rgba(26, 61, 47, 0.05);
   }
 
-  .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 60 9.1% 97.8%;
-    --card: 20 14.3% 4.1%;
-    --card-foreground: 60 9.1% 97.8%;
-    --popover: 20 14.3% 4.1%;
-    --popover-foreground: 60 9.1% 97.8%;
-    --primary: 47.9 95.8% 53.1%;
-    --primary-foreground: 26 83.3% 14.1%;
-    --secondary: 12 6.5% 15.1%;
-    --secondary-foreground: 60 9.1% 97.8%;
-    --muted: 12 6.5% 15.1%;
-    --muted-foreground: 24 5.4% 63.9%;
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 60 9.1% 97.8%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 12 6.5% 15.1%;
-    --input: 12 6.5% 15.1%;
-    --ring: 35.5 91.7% 32.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+  .glass-card-dark {
+    background: rgba(26, 61, 47, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 36px 0 rgba(15, 46, 35, 0.2);
   }
-}
 
-@layer base {
-  * {
-    @apply border-border;
+  /* Floating Pill Navbar inspired by Solar.Ray ref-design1.png */
+  .pill-nav {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(26, 61, 47, 0.08);
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03);
   }
-  body {
-    @apply bg-background text-foreground;
+
+  /* Pill button with icon circle badge */
+  .pill-btn-dark {
+    @apply inline-flex items-center gap-3 bg-organic-dark text-white rounded-full pl-5 pr-2 py-2 text-sm font-medium transition-all hover:bg-organic-deep hover:shadow-md hover:scale-[1.02];
+  }
+
+  .pill-btn-light {
+    @apply inline-flex items-center gap-3 bg-white text-organic-dark border border-black/5 rounded-full pl-5 pr-2 py-2 text-sm font-medium transition-all hover:bg-organic-pill hover:shadow-sm hover:scale-[1.02];
+  }
+
+  .pill-btn-emerald {
+    @apply inline-flex items-center gap-3 bg-organic-emerald text-white rounded-full pl-5 pr-2 py-2 text-sm font-medium transition-all hover:bg-organic-dark hover:shadow-md hover:scale-[1.02];
   }
 }
 
 @layer utilities {
-  /* ... (kode yang sudah ada) */
-  .bg-grid-gray-700\/20 {
-    background-image: linear-gradient(
-        to right,
-        theme(colors.gray.700 / 0.2) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        to bottom,
-        theme(colors.gray.700 / 0.2) 1px,
-        transparent 1px
-      );
-    background-size: 3rem 3rem;
+  .bg-organic-pattern {
+    background-image: radial-gradient(rgba(38, 82, 60, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
+
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.12s; }
+  .stagger-3 { animation-delay: 0.18s; }
+  .stagger-4 { animation-delay: 0.24s; }
+}
+
+@media print {
+  .no-print { display: none !important; }
 }
