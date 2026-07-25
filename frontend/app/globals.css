@@ -10,59 +10,54 @@ html {
 body {
   background-color: #F6F7F2;
   color: #18281F;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 @layer components {
-  /* Glassmorphism card utility inspired by Sunrock ref-design2.png */
+  /* Clean Grounded Editorial Cards (No AI glassmorphism blur slop) */
   .glass-card {
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px -5px rgba(26, 61, 47, 0.05);
+    background-color: #FFFFFF;
+    border: 1px solid rgba(24, 40, 31, 0.08);
+    box-shadow: 0 2px 10px rgba(24, 40, 31, 0.03);
   }
 
   .glass-card-dark {
-    background: rgba(26, 61, 47, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 36px 0 rgba(15, 46, 35, 0.2);
+    background-color: #1A3D2F;
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 16px rgba(15, 46, 35, 0.15);
   }
 
-  /* Floating Pill Navbar inspired by Solar.Ray ref-design1.png */
+  /* Clean Pill Navbar */
   .pill-nav {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(26, 61, 47, 0.08);
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03);
+    background-color: #FFFFFF;
+    border: 1px solid rgba(24, 40, 31, 0.08);
+    box-shadow: 0 2px 12px rgba(24, 40, 31, 0.04);
   }
 
-  /* Pill button with icon circle badge */
+  /* Crisp Action Buttons */
   .pill-btn-dark {
-    @apply inline-flex items-center gap-3 bg-organic-dark text-white rounded-full pl-5 pr-2 py-2 text-sm font-medium transition-all hover:bg-organic-deep hover:shadow-md hover:scale-[1.02];
+    @apply inline-flex items-center justify-center gap-2.5 bg-[#1A3D2F] text-white rounded-full px-5 py-2.5 text-xs font-medium transition-all hover:bg-[#0F2E23] active:scale-[0.99] shadow-xs disabled:opacity-50;
   }
 
   .pill-btn-light {
-    @apply inline-flex items-center gap-3 bg-white text-organic-dark border border-black/5 rounded-full pl-5 pr-2 py-2 text-sm font-medium transition-all hover:bg-organic-pill hover:shadow-sm hover:scale-[1.02];
+    @apply inline-flex items-center justify-center gap-2.5 bg-white text-[#18281F] border border-black/10 rounded-full px-5 py-2.5 text-xs font-medium transition-all hover:bg-black/5 active:scale-[0.99] shadow-xs disabled:opacity-50;
   }
 
   .pill-btn-emerald {
-    @apply inline-flex items-center gap-3 bg-organic-emerald text-white rounded-full pl-5 pr-2 py-2 text-sm font-medium transition-all hover:bg-organic-dark hover:shadow-md hover:scale-[1.02];
+    @apply inline-flex items-center justify-center gap-2.5 bg-[#26523C] text-white rounded-full px-5 py-2.5 text-xs font-medium transition-all hover:bg-[#1A3D2F] active:scale-[0.99] shadow-xs disabled:opacity-50;
   }
 }
 
 @layer utilities {
   .bg-organic-pattern {
-    background-image: radial-gradient(rgba(38, 82, 60, 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(38, 82, 60, 0.05) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
   .stagger-1 { animation-delay: 0.05s; }
-  .stagger-2 { animation-delay: 0.12s; }
-  .stagger-3 { animation-delay: 0.18s; }
-  .stagger-4 { animation-delay: 0.24s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
 }
 
 @media print {

@@ -1,2 +1,6 @@
 /docs
 /.agents
+/.impeccable
+node_modules
+/.codex
+/skills-lock.json
