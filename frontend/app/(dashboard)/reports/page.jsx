@@ -4,16 +4,17 @@ import { useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { queryKeys } from '@/lib/queryKeys';
-import { formatRupiah, formatKwh } from '@/lib/utils';
+import { formatRupiah, formatKwh, useUserPowerVa } from '@/lib/utils';
 import { Printer, Zap, FileText, Download, Loader2, ArrowUpRight } from 'lucide-react';
 
 export default function ReportsPage() {
   const reportRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const userPowerVa = useUserPowerVa();
 
   const { data: summary, isLoading: isLoadingSummary } = useQuery({
-    queryKey: queryKeys.summary(),
-    queryFn: () => api.post('/calculate/summary', { power_va: 1300 }),
+    queryKey: ['summary', userPowerVa],
+    queryFn: () => api.post('/calculate/summary', { power_va: userPowerVa }),
   });
 
   const { data: aiData } = useQuery({
