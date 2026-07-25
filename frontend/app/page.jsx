@@ -3,24 +3,37 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
+import Navbar from '@/components/marketing/Navbar';
+import Footer from '@/components/marketing/Footer';
 import {
   Zap,
-  BarChart3,
+  ArrowRight,
+  Calculator,
   AlertTriangle,
   Sliders,
-  Bot,
-  ArrowUpRight,
-  Plug,
-  FileText,
-  ShieldCheck,
-  Sparkles,
-  Check,
+  Home,
+  Thermometer,
+  Utensils
 } from 'lucide-react';
+
+const EASE_OUT = [0.23, 1, 0.32, 1];
+
+// Noise overlay for Editorial Luxury vibe
+const NoiseOverlay = () => (
+  <div 
+    className="pointer-events-none fixed inset-0 z-50 opacity-[0.03]"
+    style={{
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+    }}
+  />
+);
 
 export default function LandingPage() {
   const router = useRouter();
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [activeRoom, setActiveRoom] = useState('kamar');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -34,286 +47,283 @@ export default function LandingPage() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F6F7F2]">
-        <div className="flex items-center gap-3 bg-white/80 backdrop-blur-md px-6 py-3 rounded-full border border-black/5 shadow-sm">
-          <Zap className="w-5 h-5 text-emerald-800 animate-pulse" />
-          <span className="text-sm font-medium text-emerald-950">Memuat SaveBill...</span>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: EASE_OUT }}
+          className="flex items-center gap-3 bg-white px-8 py-4 rounded-full border border-black/5 shadow-sm text-sm font-medium text-[#1A3D2F]"
+        >
+          <Zap className="w-5 h-5 animate-pulse" />
+          <span>Memuat SaveBill...</span>
+        </motion.div>
       </div>
     );
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30, filter: 'blur(8px)' },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      filter: 'blur(0px)',
+      transition: { duration: 1, ease: EASE_OUT }
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#F6F7F2] text-[#18281F] flex flex-col font-sans selection:bg-emerald-900 selection:text-white">
-      {/* Floating Pill Navigation Bar (Ref: Solar.Ray ref-design1.png) */}
-      <div className="fixed top-5 inset-x-0 z-50 flex justify-center px-4">
-        <nav className="pill-nav rounded-full px-4 py-2 flex items-center justify-between w-full max-w-4xl shadow-sm">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 pl-2">
-            <div className="w-8 h-8 rounded-full bg-emerald-900 flex items-center justify-center text-emerald-300">
-              <Zap className="w-4 h-4 fill-emerald-300" />
-            </div>
-            <span className="text-base font-bold tracking-tight text-emerald-950">SaveBill</span>
-          </Link>
+    <div className="min-h-[100dvh] bg-[#FDFBF7] text-[#0A0A0A] font-sans selection:bg-[#1A3D2F] selection:text-[#FDFBF7] overflow-x-hidden relative">
+      <NoiseOverlay />
+      <Navbar />
 
-          {/* Center Links (Pill Style) */}
-          <div className="hidden md:flex items-center gap-1 text-xs font-medium text-emerald-900/70">
-            <a href="#fitur" className="px-3.5 py-1.5 rounded-full hover:bg-emerald-900/5 hover:text-emerald-950 transition-colors">Fitur</a>
-            <a href="#cara-kerja" className="px-3.5 py-1.5 rounded-full hover:bg-emerald-900/5 hover:text-emerald-950 transition-colors">Cara Kerja</a>
-            <a href="#simulasi" className="px-3.5 py-1.5 rounded-full hover:bg-emerald-900/5 hover:text-emerald-950 transition-colors">Simulasi PLN</a>
-          </div>
-
-          {/* Right Action Buttons */}
-          <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="text-xs font-medium text-emerald-900 hover:text-emerald-950 px-3.5 py-1.5 rounded-full hover:bg-emerald-900/5 transition-colors"
-            >
-              Masuk
-            </Link>
-            <Link
-              href="/register"
-              className="bg-emerald-900 text-white text-xs font-medium px-4 py-1.5 rounded-full hover:bg-emerald-950 transition-all shadow-sm"
-            >
-              Coba Gratis
-            </Link>
-          </div>
-        </nav>
-      </div>
-
-      {/* Hero Section (Ref: Solar.Ray ref-design1.png & Sunrock ref-design2.png) */}
-      <header className="pt-32 pb-20 md:pt-40 md:pb-28 px-6 md:px-12 relative overflow-hidden bg-organic-pattern">
-        <div className="max-w-5xl mx-auto text-center space-y-7 relative z-10">
-          {/* Top Pill Tag Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-black/5 text-xs font-medium text-emerald-900 shadow-sm animate-fade-in-up">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-            <span>Providing energy solutions →</span>
-          </div>
-
-          {/* Hero Main Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-emerald-950 leading-[1.1] max-w-4xl mx-auto animate-fade-in-up stagger-1">
-            Kendalikan Tagihan Listrik Rumah Anda Secara Cerdas
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-base sm:text-lg text-emerald-900/70 leading-relaxed max-w-2xl mx-auto font-normal animate-fade-in-up stagger-2">
-            Solusi audit energi berbasis AI untuk pelanggan PLN Indonesia. Catat perangkat elektronik, deteksi perangkat pemboros, dan simulasikan penghematan sebelum tagihan datang.
-          </p>
-
-          {/* Hero Action Buttons with Circular Badge */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 animate-fade-in-up stagger-3">
-            <Link href="/register" className="pill-btn-dark">
-              <span>Mulai Hemat Sekarang</span>
-              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                <ArrowUpRight className="w-4 h-4 text-white" />
+      {/* 2. Hero Section: Editorial Split / Double-Bezel */}
+      <section className="min-h-[100dvh] pt-32 pb-24 px-4 flex items-center justify-center">
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 items-center">
+          
+          <motion.div 
+            initial="hidden"
+            animate="show"
+            variants={containerVariants}
+            className="flex flex-col justify-center max-w-2xl"
+          >
+            <motion.div variants={itemVariants} className="mb-8 inline-flex">
+              <div className="rounded-full px-4 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium bg-[#1A3D2F]/5 text-[#1A3D2F] ring-1 ring-[#1A3D2F]/10">
+                Audit Energi Rumah Tangga
               </div>
-            </Link>
+            </motion.div>
 
-            <Link href="/login" className="pill-btn-light">
-              <span>Pelajari Fitur</span>
-              <div className="w-7 h-7 rounded-full bg-black/5 flex items-center justify-center">
-                <ArrowUpRight className="w-4 h-4 text-emerald-900" />
-              </div>
-            </Link>
-          </div>
+            <motion.h1 variants={itemVariants} className="text-[3rem] leading-[1.05] sm:text-[4rem] md:text-[5rem] lg:text-[5.5rem] font-medium tracking-tighter text-[#0A0A0A]">
+              Kendalikan <br/>
+              <span className="text-[#1A3D2F]">Listrik Anda.</span>
+            </motion.h1>
 
-          {/* Preview Hero Visual (Ref: Sunrock ref-design2.png Glassmorphism Widget Overlay) */}
-          <div className="pt-12 relative max-w-3xl mx-auto">
-            <div className="glass-card rounded-[2.5rem] p-6 md:p-8 border border-white/80 shadow-glass relative z-10 text-left space-y-6">
-              <div className="flex items-center justify-between border-b border-black/5 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-emerald-900 text-emerald-300 flex items-center justify-center font-bold">
-                    <Zap className="w-4 h-4 fill-emerald-300" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-emerald-950 text-sm">Dashboard Energi Rumah</h3>
-                    <p className="text-xs text-emerald-900/60">Golongan Daya 1300 VA • Tarif Rp 1.444,7/kWh</p>
+            <motion.p variants={itemVariants} className="mt-8 text-lg md:text-xl text-black/60 font-light leading-relaxed max-w-lg">
+              Identifikasi perangkat penyedot energi, simulasikan penghematan, dan tekan tagihan bulanan dengan akurasi tarif PLN resmi.
+            </motion.p>
+
+            <motion.div variants={itemVariants} className="mt-12 flex flex-col sm:flex-row items-center gap-4">
+              <Link href="/register" className="w-full sm:w-auto group active:scale-[0.98] transition-transform duration-300">
+                <div className="bg-[#1A3D2F] rounded-full p-2 pl-8 flex items-center justify-between gap-8 shadow-[0_10px_40px_rgba(26,61,47,0.2)]">
+                  <span className="text-white font-medium">Mulai Audit Gratis</span>
+                  <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                    <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 group-hover:-translate-y-[1px] transition-transform duration-300" />
                   </div>
                 </div>
-                <span className="text-xs bg-emerald-900/10 text-emerald-900 font-semibold px-3 py-1 rounded-full">
-                  Audit Aktif
-                </span>
-              </div>
+              </Link>
+            </motion.div>
+          </motion.div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Metric 1 */}
-                <div className="bg-white/80 rounded-2xl p-4 border border-black/5 space-y-1">
-                  <span className="text-xs font-medium text-emerald-900/60 uppercase tracking-wide">Estimasi Tagihan</span>
-                  <p className="text-2xl font-bold text-emerald-950">Rp 354.498</p>
-                  <p className="text-[11px] text-emerald-700 font-medium">~245.2 kWh/bulan</p>
-                </div>
-
-                {/* Metric 2 */}
-                <div className="bg-white/80 rounded-2xl p-4 border border-black/5 space-y-1">
-                  <span className="text-xs font-medium text-emerald-900/60 uppercase tracking-wide">Jumlah Perangkat</span>
-                  <p className="text-2xl font-bold text-emerald-950">8 Unit</p>
-                  <p className="text-[11px] text-emerald-900/60">Terdaftar di sistem</p>
-                </div>
-
-                {/* Metric 3 (Energy Hog Warning) */}
-                <div className="bg-red-50/80 rounded-2xl p-4 border border-red-100 space-y-1">
-                  <div className="flex items-center gap-1.5 text-red-700 text-xs font-semibold">
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    <span>Energy Hog</span>
+          {/* Interactive Editorial Blueprint Visual */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, filter: 'blur(20px)' }}
+            animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            transition={{ duration: 1.2, ease: EASE_OUT, delay: 0.4 }}
+            className="w-full relative"
+          >
+            {/* Double Bezel Outer Shell */}
+            <div className="bg-black/[0.02] p-2 sm:p-3 rounded-[2.5rem] ring-1 ring-black/[0.04]">
+              {/* Inner Core */}
+              <div className="bg-white rounded-[calc(2.5rem-0.5rem)] sm:rounded-[calc(2.5rem-0.75rem)] shadow-sm p-6 sm:p-10 border border-black/[0.04] relative overflow-hidden">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between mb-10 pb-6 border-b border-black/[0.04]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#1A3D2F]/5 flex items-center justify-center">
+                      <Home className="w-4 h-4 text-[#1A3D2F]" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#0A0A0A]">Floorplan Load</h3>
+                      <p className="text-[10px] uppercase tracking-widest text-black/40">Real-time mapping</p>
+                    </div>
                   </div>
-                  <p className="text-base font-bold text-red-900">AC 1/2 PK</p>
-                  <p className="text-[11px] text-red-600 font-medium">44% dari total listrik</p>
+                  <div className="flex items-center gap-2 bg-red-50 text-red-600 px-3 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+                    Hog Detected
+                  </div>
                 </div>
+
+                {/* Rooms Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Room 1: AC Hog */}
+                  <motion.div 
+                    onClick={() => setActiveRoom('kamar')}
+                    className={`cursor-pointer rounded-[1.5rem] p-5 transition-all duration-500 ${activeRoom === 'kamar' ? 'bg-[#FDFBF7] ring-1 ring-red-200' : 'bg-transparent hover:bg-black/[0.02]'}`}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <Thermometer className={`w-5 h-5 ${activeRoom === 'kamar' ? 'text-red-500' : 'text-black/40'}`} />
+                      <span className="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded-md">44%</span>
+                    </div>
+                    <h4 className="text-sm font-medium text-[#0A0A0A] mb-1">Kamar Utama</h4>
+                    <p className="text-[11px] text-black/40 mb-3">AC 1/2 PK (400W) · 10 Jam</p>
+                    <div className="h-1 w-full bg-black/5 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: '80%' }}
+                        transition={{ duration: 1, delay: 0.5, ease: EASE_OUT }}
+                        className="h-full bg-red-500 rounded-full"
+                      />
+                    </div>
+                  </motion.div>
+
+                  {/* Room 2 */}
+                  <motion.div 
+                    onClick={() => setActiveRoom('dapur')}
+                    className={`cursor-pointer rounded-[1.5rem] p-5 transition-all duration-500 ${activeRoom === 'dapur' ? 'bg-[#FDFBF7] ring-1 ring-[#1A3D2F]/20' : 'bg-transparent hover:bg-black/[0.02]'}`}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <Utensils className={`w-5 h-5 ${activeRoom === 'dapur' ? 'text-[#1A3D2F]' : 'text-black/40'}`} />
+                      <span className="text-xs font-semibold text-[#1A3D2F] bg-[#1A3D2F]/5 px-2 py-1 rounded-md">22%</span>
+                    </div>
+                    <h4 className="text-sm font-medium text-[#0A0A0A] mb-1">Dapur & Makan</h4>
+                    <p className="text-[11px] text-black/40 mb-3">Kulkas (120W) · 24 Jam</p>
+                    <div className="h-1 w-full bg-black/5 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: '40%' }}
+                        transition={{ duration: 1, delay: 0.6, ease: EASE_OUT }}
+                        className="h-full bg-[#1A3D2F] rounded-full"
+                      />
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Total Meter Card */}
+                <div className="mt-8 bg-[#1A3D2F] rounded-[1.5rem] p-6 text-white overflow-hidden relative">
+                  <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
+                  <div className="relative z-10 flex items-end justify-between">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-white/60 mb-2">Estimasi Tagihan</p>
+                      <h2 className="text-3xl font-medium tracking-tighter">Rp 354.498</h2>
+                    </div>
+                    <div className="text-right">
+                      <span className="inline-block bg-white/10 px-3 py-1 rounded-full text-[10px] font-semibold tracking-widest uppercase text-white/90">
+                        1300 VA
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Feature Cards Section (Ref: Sunrock & Solar.Ray Glassmorphism Grid) */}
-      <section id="fitur" className="py-20 px-6 md:px-12 max-w-5xl mx-auto space-y-12">
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-900/5 text-emerald-900 text-xs font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-800" />
-            <span>Fitur Unggulan</span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-emerald-950 tracking-tight">
-            Fitur Utama SaveBill
-          </h2>
-          <p className="text-sm text-emerald-900/70 leading-relaxed">
-            Didesain presisi sesuai dengan struktur tarif PLN Indonesia.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Feature 1 */}
-          <div className="glass-card rounded-[2rem] p-7 border border-white/80 space-y-4 hover:shadow-glass-hover transition-all">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-900 text-white flex items-center justify-center">
-              <BarChart3 className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-lg text-emerald-950">Prediksi Tagihan PLN</h3>
-            <p className="text-sm text-emerald-900/70 leading-relaxed">
-              Kalkulasi presisi estimasi tagihan bulanan berdasarkan golongan daya VA Anda dan tarif resmi PLN secara otomatis.
-            </p>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="glass-card rounded-[2rem] p-7 border border-white/80 space-y-4 hover:shadow-glass-hover transition-all">
-            <div className="w-11 h-11 rounded-2xl bg-red-600 text-white flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-lg text-emerald-950">Deteksi Perangkat Pemboros</h3>
-            <p className="text-sm text-emerald-900/70 leading-relaxed">
-              Otomatis mengidentifikasi elektronik rumah yang mengonsumsi lebih dari 40% dari total konsumsi listrik Anda.
-            </p>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="glass-card rounded-[2rem] p-7 border border-white/80 space-y-4 hover:shadow-glass-hover transition-all">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-900 text-white flex items-center justify-center">
-              <Sliders className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-lg text-emerald-950">Simulasi What-If</h3>
-            <p className="text-sm text-emerald-900/70 leading-relaxed">
-              Geser durasi pemakaian perangkat secara interaktif dan lihat perubahan perkiraan biaya dalam hitungan detik.
-            </p>
-          </div>
-
-          {/* Feature 4 */}
-          <div className="glass-card rounded-[2rem] p-7 border border-white/80 space-y-4 hover:shadow-glass-hover transition-all">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-900 text-white flex items-center justify-center">
-              <Bot className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-lg text-emerald-950">Saran Hemat Berbasis AI</h3>
-            <p className="text-sm text-emerald-900/70 leading-relaxed">
-              Dapatkan analisis dan langkah-langkah hemat energi yang dipersonalisasi dari AI Gemini Flash.
-            </p>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Cara Kerja Section */}
-      <section id="cara-kerja" className="py-20 px-6 md:px-12 bg-white/60 border-y border-black/5">
-        <div className="max-w-5xl mx-auto space-y-12">
-          <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold text-emerald-950 tracking-tight">
-              Tiga Langkah Sederhana
+      {/* 3. The Asymmetrical Bento Grid: Features */}
+      <section id="fitur" className="py-32 px-4 bg-white relative rounded-[3rem] sm:rounded-[5rem] -mt-10 ring-1 ring-black/[0.02] shadow-sm z-10">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: EASE_OUT }}
+            className="mb-20 max-w-2xl"
+          >
+            <div className="rounded-full px-4 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium bg-black/5 text-black inline-block mb-6">
+              Arsitektur Fitur
+            </div>
+            <h2 className="text-[2.5rem] md:text-[3.5rem] font-medium tracking-tighter leading-[1.1] text-[#0A0A0A]">
+              Didesain untuk kejelasan absolute.
             </h2>
-            <p className="text-sm text-emerald-900/70">
-              Mulai memantau dan menghemat penggunaan listrik rumah Anda.
-            </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Step 1 */}
-            <div className="glass-card rounded-[2rem] p-6 text-center space-y-4 border border-white/80">
-              <div className="w-9 h-9 rounded-full bg-emerald-900 text-white font-bold text-sm flex items-center justify-center mx-auto">
-                1
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+            
+            {/* Massive Card (col-8) */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: EASE_OUT }}
+              className="md:col-span-8 bg-[#FDFBF7] p-2 rounded-[2.5rem] ring-1 ring-black/[0.04]"
+            >
+              <div className="bg-white rounded-[calc(2.5rem-0.5rem)] h-full p-8 md:p-12 border border-black/[0.02] flex flex-col justify-between">
+                <div>
+                  <div className="w-12 h-12 rounded-full bg-[#1A3D2F]/5 flex items-center justify-center mb-8">
+                    <Calculator className="w-5 h-5 text-[#1A3D2F]" />
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-medium tracking-tight mb-4">Akurasi Tarif Resmi PLN</h3>
+                  <p className="text-black/50 leading-relaxed max-w-md font-light text-lg">
+                    Algoritma menghitung berdasarkan struktur tarif dasar listrik kementerian ESDM untuk golongan 900 VA hingga 5500+ VA secara presisi.
+                  </p>
+                </div>
+                <div className="mt-12 flex gap-4 text-xs font-semibold uppercase tracking-widest text-black/30">
+                  <span>R-1 (Subsidi)</span>
+                  <span>R-1 (Reguler)</span>
+                  <span>B-1 (Bisnis)</span>
+                </div>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-900/10 text-emerald-900 flex items-center justify-center mx-auto">
-                <Plug className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-emerald-950 text-base">Daftarkan Perangkat</h3>
-              <p className="text-xs text-emerald-900/70 leading-relaxed">
-                Pilih dari katalog preset atau masukkan nama, Watt, dan jam pemakaian harian.
-              </p>
-            </div>
+            </motion.div>
 
-            {/* Step 2 */}
-            <div className="glass-card rounded-[2rem] p-6 text-center space-y-4 border border-white/80">
-              <div className="w-9 h-9 rounded-full bg-emerald-900 text-white font-bold text-sm flex items-center justify-center mx-auto">
-                2
+            {/* Stacked Cards (col-4) */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.1, ease: EASE_OUT }}
+              className="md:col-span-4 flex flex-col gap-4 md:gap-6"
+            >
+              <div className="flex-1 bg-black/[0.02] p-2 rounded-[2.5rem] ring-1 ring-black/[0.04]">
+                <div className="bg-white rounded-[calc(2.5rem-0.5rem)] h-full p-8 border border-black/[0.02]">
+                  <AlertTriangle className="w-5 h-5 text-red-500 mb-6" />
+                  <h3 className="text-xl font-medium tracking-tight mb-3">Deteksi Energy Hog</h3>
+                  <p className="text-black/50 font-light text-sm leading-relaxed">
+                    Sistem mengidentifikasi alat elektronik yang memakan porsi dominan dari total biaya secara otomatis.
+                  </p>
+                </div>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-900/10 text-emerald-900 flex items-center justify-center mx-auto">
-                <BarChart3 className="w-6 h-6" />
+              <div className="flex-1 bg-[#1A3D2F] p-2 rounded-[2.5rem]">
+                <div className="bg-[#153025] rounded-[calc(2.5rem-0.5rem)] h-full p-8 flex flex-col justify-between">
+                  <Sliders className="w-5 h-5 text-white/50 mb-6" />
+                  <div>
+                    <h3 className="text-xl font-medium text-white tracking-tight mb-3">Simulasi Interaktif</h3>
+                    <p className="text-white/60 font-light text-sm leading-relaxed">
+                      Ubah jam operasional perangkat dan lihat dampak finansialnya secara real-time.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h3 className="font-semibold text-emerald-950 text-base">Lihat Analisis Audit</h3>
-              <p className="text-xs text-emerald-900/70 leading-relaxed">
-                Dashboard otomatis menyajikan breakdown biaya bulanan dan menemukan perangkat boros.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="glass-card rounded-[2rem] p-6 text-center space-y-4 border border-white/80">
-              <div className="w-9 h-9 rounded-full bg-emerald-900 text-white font-bold text-sm flex items-center justify-center mx-auto">
-                3
-              </div>
-              <div className="w-12 h-12 rounded-2xl bg-emerald-900/10 text-emerald-900 flex items-center justify-center mx-auto">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="font-semibold text-emerald-950 text-base">Unduh Laporan PDF</h3>
-              <p className="text-xs text-emerald-900/70 leading-relaxed">
-                Simulasikan penyesuaian jam pakai, dapatkan rekomendasi AI, dan cetak PDF laporan.
-              </p>
-            </div>
-          </div>
-
-          <div className="text-center pt-4">
-            <Link href="/register" className="pill-btn-dark">
-              <span>Coba Sekarang — Gratis</span>
-              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                <ArrowUpRight className="w-4 h-4 text-white" />
-              </div>
-            </Link>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-6 md:px-12 bg-[#F6F7F2] border-t border-black/5 mt-auto">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-emerald-900 flex items-center justify-center text-emerald-300">
-              <Zap className="w-3.5 h-3.5 fill-emerald-300" />
-            </div>
-            <span className="text-sm font-bold text-emerald-950">SaveBill Indonesia</span>
-          </div>
-
-          <div className="flex items-center gap-6 text-xs text-emerald-900/70">
-            <Link href="/login" className="hover:text-emerald-950 transition-colors">Masuk</Link>
-            <Link href="/register" className="hover:text-emerald-950 transition-colors">Daftar</Link>
-            <a href="#fitur" className="hover:text-emerald-950 transition-colors">Fitur</a>
-            <a href="#cara-kerja" className="hover:text-emerald-950 transition-colors">Cara Kerja</a>
-          </div>
-
-          <p className="text-xs text-emerald-900/40">© 2026 SaveBill. All rights reserved.</p>
+      {/* 4. Large CTA / Manifesto */}
+      <section className="py-40 px-4 bg-[#FDFBF7]">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: EASE_OUT }}
+          >
+            <h2 className="text-[3rem] md:text-[4.5rem] font-medium tracking-tighter leading-[1.05] text-[#0A0A0A] mb-12">
+              Berhenti menebak-nebak. <br/>
+              Mulai kendalikan <span className="text-[#1A3D2F]">anggaran Anda.</span>
+            </h2>
+            
+            <Link href="/register" className="inline-block group active:scale-[0.98] transition-transform duration-300">
+              <div className="bg-[#0A0A0A] rounded-full p-2 pl-10 flex items-center justify-between gap-10 hover:bg-[#1A3D2F] transition-colors duration-500">
+                <span className="text-white font-medium text-lg">Buat Akun Gratis</span>
+                <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
+                  <ArrowRight className="w-6 h-6 text-white group-hover:translate-x-1 group-hover:-translate-y-[1px] transition-transform duration-300" />
+                </div>
+              </div>
+            </Link>
+          </motion.div>
         </div>
-      </footer>
+      </section>
+
+      {/* 5. Rich Footer */}
+      <Footer />
     </div>
   );
 }
