@@ -74,9 +74,13 @@ module.exports = {
         full: '9999px',
       },
       boxShadow: {
+        'xs': '0 1px 3px 0 rgba(24, 40, 31, 0.04)',
         'glass': '0 8px 32px 0 rgba(24, 40, 31, 0.05)',
         'glass-hover': '0 12px 40px 0 rgba(24, 40, 31, 0.1)',
         'pill': '0 4px 20px 0 rgba(0, 0, 0, 0.04)',
+      },
+      transitionTimingFunction: {
+        'apple-out': 'cubic-bezier(0.23, 1, 0.32, 1)',
       },
       keyframes: {
         "accordion-down": {
