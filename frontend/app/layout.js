@@ -30,7 +30,7 @@ export const metadata = {
     siteName: "SaveBill",
     images: [
       {
-        url: "/og-image.jpg", // Placeholder gambar OpenGraph, simpan di folder public/
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "SaveBill - Kendalikan Tagihan Listrik Anda",
@@ -43,7 +43,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "SaveBill — Hemat Listrik & Audit Energi Rumah Anda",
     description: "Kendalikan anggaran listrik rumah tangga Anda dengan presisi. Coba audit gratis sekarang.",
-    images: ["/og-image.jpg"],
+    images: ["/og-image.png"],
     creator: "@savebill_id",
   },
   robots: {
